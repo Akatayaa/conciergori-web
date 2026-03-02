@@ -91,10 +91,10 @@ export async function POST(req: NextRequest) {
         replyTo: guest_email,
       })
 
-      // Email de confirmation au voyageur
+      // Email de confirmation au voyageur (+ copie hôte en dev sans domaine vérifié)
       await resend.emails.send({
         from: 'Concierg\'ori <onboarding@resend.dev>',
-        to: guest_email,
+        to: [guest_email, hostEmail],
         subject: `✅ Demande reçue — ${property.name}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
