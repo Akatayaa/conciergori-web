@@ -33,7 +33,15 @@ export default async function DashboardPage({ params }: { params: Promise<{ tena
         {/* Sidebar */}
         <aside className="w-64 hidden md:flex flex-col" style={{ backgroundColor: '#00243f' }}>
           <div className="p-6 border-b" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-            <img src="/logo.svg" alt="Concierg'ori" className="h-12 w-auto" />
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl overflow-hidden bg-white p-1 flex-shrink-0">
+                <img src="/logo.svg" alt="Concierg'ori" className="h-10 w-10 object-cover" />
+              </div>
+              <div>
+                <p className="text-white font-[var(--font-suez)] text-base leading-tight">Concierg'ori</p>
+                <p className="text-white/40 text-xs">Dashboard</p>
+              </div>
+            </div>
           </div>
           <nav className="flex-1 p-4 space-y-1">
             {[
