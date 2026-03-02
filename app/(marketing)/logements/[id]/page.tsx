@@ -1,3 +1,4 @@
+import PhotoGallery from '@/components/PhotoGallery'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -44,24 +45,10 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           <Link href="/logements" className="hover:text-[#0097b2] transition-colors">← Tous les logements</Link>
         </div>
 
-        {/* Galerie photos */}
+        {/* Galerie photos avec lightbox */}
         {photos.length > 0 && (
           <div className="mb-8">
-            {/* Photo principale */}
-            <div className="rounded-3xl overflow-hidden h-72 md:h-[420px] mb-2">
-              <img src={photos[0]} alt={property.name} className="w-full h-full object-cover" />
-            </div>
-            {/* Miniatures */}
-            {photos.length > 1 && (
-              <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
-                {photos.slice(1).map((img, i) => (
-                  <div key={i} className="rounded-xl overflow-hidden h-20 md:h-24">
-                    <img src={img} alt={`${property.name} ${i + 2}`}
-                         className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer" />
-                  </div>
-                ))}
-              </div>
-            )}
+            <PhotoGallery photos={photos} title={property.name} />
           </div>
         )}
 
