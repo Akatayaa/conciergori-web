@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
 
       // Email à Oriane
       await resend.emails.send({
-        from: 'Concierg\'ori <notifications@conciergori.fr>',
+        from: 'Concierg\'ori <onboarding@resend.dev>',
         to: hostEmail,
         subject: `📋 Nouvelle demande — ${property.name}`,
         html: `
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
 
       // Email de confirmation au voyageur
       await resend.emails.send({
-        from: 'Concierg\'ori <bonjour@conciergori.fr>',
+        from: 'Concierg\'ori <onboarding@resend.dev>',
         to: guest_email,
         subject: `✅ Demande reçue — ${property.name}`,
         html: `
