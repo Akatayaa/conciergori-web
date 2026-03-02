@@ -1,6 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { DayPicker, DateRange } from 'react-day-picker'
+import { fr } from 'react-day-picker/locale'
+import 'react-day-picker/style.css'
 
 interface BookingFormProps {
   propertyId: string
@@ -9,58 +12,64 @@ interface BookingFormProps {
 }
 
 export default function BookingForm({ propertyId, maxGuests, basePrice }: BookingFormProps) {
-  const [form, setForm] = useState({
-    guest_name: '', guest_email: '', check_in: '', check_out: '', guests: '1'
-  })
+  const [range, setRange] = useState<DateRange | undefined>()
+  const [guests, setGuests] = useState('1')
+  const [guestName, setGuestName] = useState('')
+  const [guestEmail, setGuestEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set())
-  const [loadingCal, setLoadingCal] = useState(true)
+  const [blockedDates, setBlockedDates] = useState<Date[]>([])
   const [hasIcal, setHasIcal] = useState(false)
+  const [showCal, setShowCal] = useState(false)
+  const calRef = useRef<HTMLDivElement>(null)
 
-  // Charger les dates bloquées depuis Airbnb
   useEffect(() => {
     fetch(`/api/availability?property_id=${propertyId}`)
       .then(r => r.json())
       .then(data => {
-        setBlockedDates(new Set(data.blocked ?? []))
+        const dates = (data.blocked ?? []).map((s: string) => new Date(s + 'T12:00:00'))
+        setBlockedDates(dates)
         setHasIcal(data.hasIcal ?? false)
-        setLoadingCal(false)
       })
-      .catch(() => setLoadingCal(false))
   }, [propertyId])
 
-  const isBlocked = (dateStr: string) => blockedDates.has(dateStr)
-
-  // Vérifier si une plage de dates contient des jours bloqués
-  const rangeHasBlocked = (start: string, end: string) => {
-    if (!start || !end) return false
-    const d = new Date(start)
-    const endDate = new Date(end)
-    while (d < endDate) {
-      if (isBlocked(d.toISOString().split('T')[0])) return true
-      d.setDate(d.getDate() + 1)
+  // Fermer le calendrier si clic extérieur
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (calRef.current && !calRef.current.contains(e.target as Node)) setShowCal(false)
     }
-    return false
-  }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
-  const nights = form.check_in && form.check_out
-    ? Math.max(0, Math.round((new Date(form.check_out).getTime() - new Date(form.check_in).getTime()) / 86400000))
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const nights = range?.from && range?.to
+    ? Math.round((range.to.getTime() - range.from.getTime()) / 86400000)
     : 0
   const total = basePrice > 0 && nights > 0 ? basePrice * nights : null
-  const today = new Date().toISOString().split('T')[0]
-  const rangeBlocked = rangeHasBlocked(form.check_in, form.check_out)
+
+  const fmt = (d?: Date) => d
+    ? d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+    : null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (rangeBlocked) return
+    if (!range?.from || !range?.to) return
     setStatus('loading')
-    setErrorMsg('')
     try {
       const res = await fetch('/api/reservations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ property_id: propertyId, ...form }),
+        body: JSON.stringify({
+          property_id: propertyId,
+          guest_name: guestName,
+          guest_email: guestEmail,
+          check_in: range.from.toISOString().split('T')[0],
+          check_out: range.to.toISOString().split('T')[0],
+          guests,
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur')
@@ -77,7 +86,6 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         <div className="text-5xl mb-4">🎉</div>
         <h3 className="font-bold text-lg mb-2" style={{ color: '#00243f' }}>Demande envoyée !</h3>
         <p className="text-sm" style={{ color: '#4b4b4b' }}>Oriane vous contactera sous 24h pour confirmer.</p>
-        <p className="text-xs mt-3" style={{ color: '#979797' }}>Un email de confirmation vous a été envoyé.</p>
       </div>
     )
   }
@@ -85,7 +93,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
   return (
     <div className="rounded-3xl p-6 shadow-lg bg-white" id="reserver">
       {/* Prix */}
-      <div className="mb-4">
+      <div className="mb-3">
         {basePrice > 0 ? (
           <><span className="text-3xl font-bold" style={{ color: '#00243f' }}>{basePrice}€</span>
           <span className="text-sm ml-1" style={{ color: '#979797' }}>/nuit</span></>
@@ -94,44 +102,69 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         )}
       </div>
 
-      {/* Statut calendrier */}
       {hasIcal && (
         <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: '#979797' }}>
           <span className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
-          {loadingCal ? 'Chargement des disponibilités…' : 'Disponibilités synchronisées avec Airbnb'}
+          Disponibilités synchronisées avec Airbnb
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Arrivée</label>
-            <input type="date" min={today} required
-              value={form.check_in}
-              onChange={e => setForm(f => ({ ...f, check_in: e.target.value, check_out: '' }))}
-              className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
-              style={{ borderColor: '#e8d8c0' }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Départ</label>
-            <input type="date" min={form.check_in || today} required
-              value={form.check_out}
-              onChange={e => setForm(f => ({ ...f, check_out: e.target.value }))}
-              className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
-              style={{ borderColor: '#e8d8c0' }} />
-          </div>
+        {/* Sélecteur de dates custom */}
+        <div className="relative" ref={calRef}>
+          <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Dates</label>
+          <button type="button"
+            onClick={() => setShowCal(!showCal)}
+            className="w-full px-3 py-2 rounded-xl border text-sm text-left flex items-center justify-between"
+            style={{ borderColor: showCal ? '#0097b2' : '#e8d8c0' }}>
+            <span style={{ color: range?.from ? '#00243f' : '#979797' }}>
+              {range?.from
+                ? range.to
+                  ? `${fmt(range.from)} → ${fmt(range.to)}`
+                  : `${fmt(range.from)} → …`
+                : 'Sélectionner les dates'}
+            </span>
+            <span style={{ color: '#979797' }}>📅</span>
+          </button>
+
+          {showCal && (
+            <div className="absolute z-50 left-0 mt-2 rounded-2xl shadow-2xl bg-white border overflow-hidden"
+              style={{ borderColor: '#e8d8c0', minWidth: 300 }}>
+              <style>{`
+                .rdp { --rdp-accent-color: #0097b2; --rdp-accent-background-color: #e0f5f9; font-family: inherit; }
+                .rdp-day_button { border-radius: 50%; }
+                .rdp-selected .rdp-day_button { background: #0097b2 !important; color: white; }
+                .rdp-range_middle .rdp-day_button { background: #e0f5f9 !important; color: #00243f; border-radius: 0; }
+                .rdp-range_start .rdp-day_button, .rdp-range_end .rdp-day_button { background: #0097b2 !important; color: white; }
+                .rdp-disabled .rdp-day_button { color: #ddd !important; text-decoration: line-through; background: #fafafa !important; cursor: not-allowed; }
+              `}</style>
+              <DayPicker
+                locale={fr}
+                mode="range"
+                selected={range}
+                onSelect={(r) => {
+                  setRange(r)
+                  if (r?.from && r?.to) setShowCal(false)
+                }}
+                disabled={[
+                  { before: today },
+                  ...blockedDates.map(d => ({ from: d, to: d }))
+                ]}
+                fromMonth={today}
+                numberOfMonths={1}
+              />
+              {blockedDates.length > 0 && (
+                <div className="px-4 pb-3 flex items-center gap-2 text-xs" style={{ color: '#979797' }}>
+                  <span className="inline-block w-4 h-4 rounded text-center leading-4" style={{ background: '#fafafa', border: '1px solid #eee', textDecoration: 'line-through', fontSize: 10 }}>5</span>
+                  Date non disponible
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Alerte dates bloquées */}
-        {rangeBlocked && (
-          <div className="px-3 py-2 rounded-xl text-sm text-red-600 bg-red-50 flex items-center gap-2">
-            <span>⚠️</span>
-            <span>Ces dates sont déjà réservées. Veuillez choisir d'autres dates.</span>
-          </div>
-        )}
-
-        {/* Résumé nuits + prix */}
-        {nights > 0 && !rangeBlocked && (
+        {/* Résumé */}
+        {nights > 0 && (
           <div className="px-3 py-2 rounded-xl text-sm" style={{ backgroundColor: '#fff2e0' }}>
             {nights} nuit{nights > 1 ? 's' : ''}
             {total ? <span className="float-right font-bold" style={{ color: '#00243f' }}>{total}€</span> : null}
@@ -140,7 +173,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
 
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Voyageurs</label>
-          <select value={form.guests} onChange={e => setForm(f => ({ ...f, guests: e.target.value }))}
+          <select value={guests} onChange={e => setGuests(e.target.value)}
             className="w-full px-3 py-2 rounded-xl border text-sm" style={{ borderColor: '#e8d8c0' }}>
             {Array.from({ length: maxGuests }, (_, i) => (
               <option key={i+1} value={i+1}>{i+1} voyageur{i+1 > 1 ? 's' : ''}</option>
@@ -150,16 +183,16 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
 
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Votre nom</label>
-          <input type="text" placeholder="Prénom Nom" required
-            value={form.guest_name} onChange={e => setForm(f => ({ ...f, guest_name: e.target.value }))}
+          <input type="text" placeholder="Prénom Nom" required value={guestName}
+            onChange={e => setGuestName(e.target.value)}
             className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
             style={{ borderColor: '#e8d8c0' }} />
         </div>
 
         <div>
           <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Email</label>
-          <input type="email" placeholder="vous@email.com" required
-            value={form.guest_email} onChange={e => setForm(f => ({ ...f, guest_email: e.target.value }))}
+          <input type="email" placeholder="vous@email.com" required value={guestEmail}
+            onChange={e => setGuestEmail(e.target.value)}
             className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
             style={{ borderColor: '#e8d8c0' }} />
         </div>
@@ -167,7 +200,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         {status === 'error' && <p className="text-xs text-red-500">{errorMsg}</p>}
 
         <button type="submit"
-          disabled={status === 'loading' || rangeBlocked}
+          disabled={status === 'loading' || !range?.from || !range?.to}
           className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity disabled:opacity-40"
           style={{ backgroundColor: '#0097b2' }}>
           {status === 'loading' ? 'Envoi en cours…' : 'Envoyer une demande'}
