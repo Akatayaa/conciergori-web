@@ -6,9 +6,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50" style={{ backgroundColor: '#00243f' }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <a href="#" className="font-[var(--font-suez)] text-xl tracking-tight text-white">
-            Concierg&apos;ori
-          </a>
+          <a href="#"><img src="/logo.svg" alt="Concierg'ori" className="h-10 w-auto" /></a>
 
           {/* Nav links */}
           <nav className="hidden md:flex items-center gap-8">
