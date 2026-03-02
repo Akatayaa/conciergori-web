@@ -1,20 +1,27 @@
-import { Playfair_Display, Inter } from 'next/font/google'
+import { Suez_One, Alkatra, Quicksand } from 'next/font/google'
 
-const playfair = Playfair_Display({
+const suezOne = Suez_One({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  weight: '400',
+  variable: '--font-suez',
   display: 'swap',
 })
 
-const inter = Inter({
+const alkatra = Alkatra({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-alkatra',
+  display: 'swap',
+})
+
+const quicksand = Quicksand({
+  subsets: ['latin'],
+  variable: '--font-quicksand',
   display: 'swap',
 })
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={`${playfair.variable} ${inter.variable} font-sans`}>
+    <div className={`${suezOne.variable} ${alkatra.variable} ${quicksand.variable} font-[var(--font-quicksand)]`}>
       {children}
     </div>
   )
