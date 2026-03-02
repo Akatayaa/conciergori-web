@@ -1,3 +1,4 @@
+import Link from 'next/link'
 export default function LandingPage() {
   return (
     <div className="font-[var(--font-quicksand)]" style={{ color: '#4b4b4b' }}>
