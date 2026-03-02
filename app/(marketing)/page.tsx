@@ -3,16 +3,16 @@ export default function LandingPage() {
     <div className="font-[var(--font-quicksand)]" style={{ color: '#4b4b4b' }}>
 
       {/* ── 1. NAVBAR ─────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50" style={{ backgroundColor: '#00243f' }}>
+      <header className="sticky top-0 z-50" style={{ backgroundColor: '#fff2e0', borderBottom: '1px solid #e8d8c0' }}>
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <a href="#"><img src="/logo.svg" alt="Concierg'ori" className="h-10 w-auto" /></a>
+          <a href="#"><img src="/logo.svg" alt="Concierg'ori" className="h-14 w-auto" /></a>
 
           {/* Nav links */}
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#services" className="text-sm font-medium text-white/80 hover:text-[#0097b2] transition-colors">Services</a>
-            <a href="#tarifs" className="text-sm font-medium text-white/80 hover:text-[#0097b2] transition-colors">Tarifs</a>
-            <a href="#contact" className="text-sm font-medium text-white/80 hover:text-[#0097b2] transition-colors">Contact</a>
+            <a href="#services" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Services</a>
+            <a href="#tarifs" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Tarifs</a>
+            <a href="#contact" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Contact</a>
           </nav>
 
           {/* CTA */}
@@ -319,24 +319,22 @@ export default function LandingPage() {
       </section>
 
       {/* ── 8. FOOTER ─────────────────────────────────────────────────── */}
-      <footer id="tarifs" style={{ backgroundColor: '#00243f', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <footer id="tarifs" style={{ backgroundColor: '#fff2e0', borderTop: '1px solid #e8d8c0' }}>
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             {/* Logo */}
-            <a href="#" className="font-[var(--font-suez)] text-xl tracking-tight text-white">
-              Concierg&apos;ori
-            </a>
+            <a href="#"><img src="/logo.svg" alt="Concierg'ori" className="h-16 w-auto" /></a>
 
             {/* Links */}
             <nav className="flex flex-wrap justify-center gap-6">
-              <a href="#services" className="text-sm text-white/60 hover:text-[#0097b2] transition-colors">Services</a>
-              <a href="#tarifs" className="text-sm text-white/60 hover:text-[#0097b2] transition-colors">Tarifs</a>
-              <a href="#contact" className="text-sm text-white/60 hover:text-[#0097b2] transition-colors">Contact</a>
-              <a href="#" className="text-sm text-white/60 hover:text-[#0097b2] transition-colors">Mentions légales</a>
+              <a href="#services" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Services</a>
+              <a href="#tarifs" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Tarifs</a>
+              <a href="#contact" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Contact</a>
+              <a href="#" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Mentions légales</a>
             </nav>
 
             {/* Copyright */}
-            <p className="text-sm text-white/40">
+            <p className="text-sm" style={{ color: '#979797' }}>
               © Concierg&apos;ori 2025 · Caen, Normandie
             </p>
           </div>
