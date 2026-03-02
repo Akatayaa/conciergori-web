@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface BookingFormProps {
   propertyId: string
@@ -14,18 +14,48 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
   })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set())
+  const [loadingCal, setLoadingCal] = useState(true)
+  const [hasIcal, setHasIcal] = useState(false)
+
+  // Charger les dates bloquées depuis Airbnb
+  useEffect(() => {
+    fetch(`/api/availability?property_id=${propertyId}`)
+      .then(r => r.json())
+      .then(data => {
+        setBlockedDates(new Set(data.blocked ?? []))
+        setHasIcal(data.hasIcal ?? false)
+        setLoadingCal(false)
+      })
+      .catch(() => setLoadingCal(false))
+  }, [propertyId])
+
+  const isBlocked = (dateStr: string) => blockedDates.has(dateStr)
+
+  // Vérifier si une plage de dates contient des jours bloqués
+  const rangeHasBlocked = (start: string, end: string) => {
+    if (!start || !end) return false
+    const d = new Date(start)
+    const endDate = new Date(end)
+    while (d < endDate) {
+      if (isBlocked(d.toISOString().split('T')[0])) return true
+      d.setDate(d.getDate() + 1)
+    }
+    return false
+  }
 
   const nights = form.check_in && form.check_out
     ? Math.max(0, Math.round((new Date(form.check_out).getTime() - new Date(form.check_in).getTime()) / 86400000))
     : 0
-
   const total = basePrice > 0 && nights > 0 ? basePrice * nights : null
+  const today = new Date().toISOString().split('T')[0]
+  const rangeBlocked = rangeHasBlocked(form.check_in, form.check_out)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (rangeBlocked) return
     setStatus('loading')
     setErrorMsg('')
-
     try {
       const res = await fetch('/api/reservations', {
         method: 'POST',
@@ -41,19 +71,13 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
     }
   }
 
-  const today = new Date().toISOString().split('T')[0]
-
   if (status === 'success') {
     return (
       <div className="rounded-3xl p-8 shadow-lg bg-white text-center">
         <div className="text-5xl mb-4">🎉</div>
         <h3 className="font-bold text-lg mb-2" style={{ color: '#00243f' }}>Demande envoyée !</h3>
-        <p className="text-sm" style={{ color: '#4b4b4b' }}>
-          Oriane vous contactera sous 24h pour confirmer.
-        </p>
-        <p className="text-xs mt-3" style={{ color: '#979797' }}>
-          Un email de confirmation vous a été envoyé.
-        </p>
+        <p className="text-sm" style={{ color: '#4b4b4b' }}>Oriane vous contactera sous 24h pour confirmer.</p>
+        <p className="text-xs mt-3" style={{ color: '#979797' }}>Un email de confirmation vous a été envoyé.</p>
       </div>
     )
   }
@@ -69,6 +93,14 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
           <span className="text-lg font-semibold" style={{ color: '#00243f' }}>Prix sur demande</span>
         )}
       </div>
+
+      {/* Statut calendrier */}
+      {hasIcal && (
+        <div className="flex items-center gap-2 mb-3 text-xs" style={{ color: '#979797' }}>
+          <span className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
+          {loadingCal ? 'Chargement des disponibilités…' : 'Disponibilités synchronisées avec Airbnb'}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
@@ -90,8 +122,16 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
           </div>
         </div>
 
+        {/* Alerte dates bloquées */}
+        {rangeBlocked && (
+          <div className="px-3 py-2 rounded-xl text-sm text-red-600 bg-red-50 flex items-center gap-2">
+            <span>⚠️</span>
+            <span>Ces dates sont déjà réservées. Veuillez choisir d'autres dates.</span>
+          </div>
+        )}
+
         {/* Résumé nuits + prix */}
-        {nights > 0 && (
+        {nights > 0 && !rangeBlocked && (
           <div className="px-3 py-2 rounded-xl text-sm" style={{ backgroundColor: '#fff2e0' }}>
             {nights} nuit{nights > 1 ? 's' : ''}
             {total ? <span className="float-right font-bold" style={{ color: '#00243f' }}>{total}€</span> : null}
@@ -124,18 +164,15 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
             style={{ borderColor: '#e8d8c0' }} />
         </div>
 
-        {status === 'error' && (
-          <p className="text-xs text-red-500">{errorMsg}</p>
-        )}
+        {status === 'error' && <p className="text-xs text-red-500">{errorMsg}</p>}
 
-        <button type="submit" disabled={status === 'loading'}
-          className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity disabled:opacity-60"
+        <button type="submit"
+          disabled={status === 'loading' || rangeBlocked}
+          className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity disabled:opacity-40"
           style={{ backgroundColor: '#0097b2' }}>
           {status === 'loading' ? 'Envoi en cours…' : 'Envoyer une demande'}
         </button>
-        <p className="text-xs text-center" style={{ color: '#979797' }}>
-          Sans engagement · Confirmation sous 24h
-        </p>
+        <p className="text-xs text-center" style={{ color: '#979797' }}>Sans engagement · Confirmation sous 24h</p>
       </form>
     </div>
   )
