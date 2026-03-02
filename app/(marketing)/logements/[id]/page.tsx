@@ -17,6 +17,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
   if (!property) return notFound()
 
+  const photos: string[] = property.photos ?? (property.cover_image ? [property.cover_image] : [])
+
   return (
     <div style={{ color: '#4b4b4b', backgroundColor: '#fff2e0', minHeight: '100vh' }}
          className="font-[var(--font-quicksand)]">
@@ -30,11 +32,8 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             <Link href="/logements" className="text-sm font-medium text-[#0097b2]">Logements</Link>
             <Link href="/#contact" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Contact</Link>
           </nav>
-          <Link href="#reserver"
-            className="px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-            style={{ backgroundColor: '#0097b2' }}>
-            Réserver
-          </Link>
+          <Link href="#reserver" className="px-5 py-2.5 rounded-full text-sm font-semibold text-white"
+            style={{ backgroundColor: '#0097b2' }}>Réserver</Link>
         </div>
       </header>
 
@@ -45,54 +44,57 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           <Link href="/logements" className="hover:text-[#0097b2] transition-colors">← Tous les logements</Link>
         </div>
 
-        {/* Hero image */}
-        {property.cover_image && (
-          <div className="rounded-3xl overflow-hidden h-80 md:h-[480px] mb-8">
-            <img src={property.cover_image} alt={property.name}
-                 className="w-full h-full object-cover" />
+        {/* Galerie photos */}
+        {photos.length > 0 && (
+          <div className="mb-8">
+            {/* Photo principale */}
+            <div className="rounded-3xl overflow-hidden h-72 md:h-[420px] mb-2">
+              <img src={photos[0]} alt={property.name} className="w-full h-full object-cover" />
+            </div>
+            {/* Miniatures */}
+            {photos.length > 1 && (
+              <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+                {photos.slice(1).map((img, i) => (
+                  <div key={i} className="rounded-xl overflow-hidden h-20 md:h-24">
+                    <img src={img} alt={`${property.name} ${i + 2}`}
+                         className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-          {/* Infos logement */}
+          {/* Infos */}
           <div className="lg:col-span-2">
-            <p className="text-[#0097b2] font-semibold text-sm tracking-wide uppercase mb-2">
-              {property.address}
-            </p>
+            <p className="text-[#0097b2] font-semibold text-sm tracking-wide uppercase mb-2">{property.address}</p>
             <h1 className="font-[var(--font-suez)] text-3xl md:text-4xl mb-4" style={{ color: '#00243f' }}>
               {property.name}
             </h1>
 
-            {/* Capacité */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-sm font-medium shadow-sm">
+            <div className="flex flex-wrap gap-3 mb-8">
+              <span className="px-4 py-2 rounded-full bg-white text-sm font-medium shadow-sm">
                 🛏 {property.bedrooms === 0 ? 'Studio' : `${property.bedrooms} chambre${property.bedrooms > 1 ? 's' : ''}`}
               </span>
-              <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-sm font-medium shadow-sm">
+              <span className="px-4 py-2 rounded-full bg-white text-sm font-medium shadow-sm">
                 👤 {property.max_guests} voyageur{property.max_guests > 1 ? 's' : ''} max
               </span>
-              <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white text-sm font-medium shadow-sm">
-                📍 Normandie
-              </span>
+              <span className="px-4 py-2 rounded-full bg-white text-sm font-medium shadow-sm">📍 Normandie</span>
             </div>
 
             {property.description && (
               <div className="mb-8">
-                <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-3" style={{ color: '#00243f' }}>
-                  À propos de ce logement
-                </h2>
+                <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-3" style={{ color: '#00243f' }}>À propos</h2>
                 <p className="leading-relaxed">{property.description}</p>
               </div>
             )}
 
-            {/* Lien Airbnb */}
             <div className="p-5 rounded-2xl bg-white shadow-sm">
-              <p className="text-sm font-medium mb-3" style={{ color: '#00243f' }}>
-                Ce logement est aussi disponible sur Airbnb
-              </p>
+              <p className="text-sm font-medium mb-2" style={{ color: '#00243f' }}>Aussi disponible sur Airbnb</p>
               <a href={property.airbnb_url} target="_blank" rel="noopener noreferrer"
-                 className="inline-flex items-center gap-2 text-sm font-semibold text-[#0097b2] hover:underline">
+                 className="text-sm font-semibold text-[#0097b2] hover:underline">
                 Voir l'annonce Airbnb →
               </a>
             </div>
@@ -103,16 +105,12 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
             <div className="sticky top-24 rounded-3xl p-6 shadow-lg bg-white">
               <div className="mb-4">
                 {property.base_price > 0 ? (
-                  <>
-                    <span className="text-3xl font-bold" style={{ color: '#00243f' }}>{property.base_price}€</span>
-                    <span className="text-sm ml-1" style={{ color: '#979797' }}>/nuit</span>
-                  </>
+                  <><span className="text-3xl font-bold" style={{ color: '#00243f' }}>{property.base_price}€</span>
+                  <span className="text-sm ml-1" style={{ color: '#979797' }}>/nuit</span></>
                 ) : (
                   <span className="text-lg font-semibold" style={{ color: '#00243f' }}>Prix sur demande</span>
                 )}
               </div>
-
-              {/* Formulaire simple */}
               <form className="space-y-3">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
@@ -140,21 +138,17 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
                   <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Email</label>
                   <input type="email" placeholder="vous@email.com" className="w-full px-3 py-2 rounded-xl border text-sm" style={{ borderColor: '#e8d8c0' }} />
                 </div>
-                <button type="submit"
-                  className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity hover:opacity-90"
+                <button type="submit" className="w-full py-3 rounded-full text-white font-semibold text-sm hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: '#0097b2' }}>
                   Envoyer une demande
                 </button>
-                <p className="text-xs text-center" style={{ color: '#979797' }}>
-                  Sans engagement · Confirmation sous 24h
-                </p>
+                <p className="text-xs text-center" style={{ color: '#979797' }}>Sans engagement · Confirmation sous 24h</p>
               </form>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
       <footer className="mt-16" style={{ backgroundColor: '#fff2e0', borderTop: '1px solid #e8d8c0' }}>
         <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/"><img src="/logo.svg" alt="Concierg'ori" className="h-12 w-auto" /></Link>
