@@ -329,6 +329,7 @@ export default function LandingPage() {
             {/* Links */}
             <nav className="flex flex-wrap justify-center gap-6">
               <a href="#services" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Services</a>
+              <a href="/logements" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Logements</a>
               <a href="#tarifs" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Tarifs</a>
               <a href="#contact" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Contact</a>
               <a href="#" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Mentions légales</a>
