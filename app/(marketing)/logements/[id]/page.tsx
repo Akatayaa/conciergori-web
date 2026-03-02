@@ -1,3 +1,4 @@
+import BookingForm from '@/components/BookingForm'
 import PhotoGallery from '@/components/PhotoGallery'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
@@ -88,49 +89,13 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
           </div>
 
           {/* Encart réservation */}
-          <div className="lg:col-span-1" id="reserver">
-            <div className="sticky top-24 rounded-3xl p-6 shadow-lg bg-white">
-              <div className="mb-4">
-                {property.base_price > 0 ? (
-                  <><span className="text-3xl font-bold" style={{ color: '#00243f' }}>{property.base_price}€</span>
-                  <span className="text-sm ml-1" style={{ color: '#979797' }}>/nuit</span></>
-                ) : (
-                  <span className="text-lg font-semibold" style={{ color: '#00243f' }}>Prix sur demande</span>
-                )}
-              </div>
-              <form className="space-y-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Arrivée</label>
-                    <input type="date" className="w-full px-3 py-2 rounded-xl border text-sm" style={{ borderColor: '#e8d8c0' }} />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Départ</label>
-                    <input type="date" className="w-full px-3 py-2 rounded-xl border text-sm" style={{ borderColor: '#e8d8c0' }} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Voyageurs</label>
-                  <select className="w-full px-3 py-2 rounded-xl border text-sm" style={{ borderColor: '#e8d8c0' }}>
-                    {Array.from({ length: property.max_guests }, (_, i) => (
-                      <option key={i+1} value={i+1}>{i+1} voyageur{i+1 > 1 ? 's' : ''}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Votre nom</label>
-                  <input type="text" placeholder="Prénom Nom" className="w-full px-3 py-2 rounded-xl border text-sm" style={{ borderColor: '#e8d8c0' }} />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Email</label>
-                  <input type="email" placeholder="vous@email.com" className="w-full px-3 py-2 rounded-xl border text-sm" style={{ borderColor: '#e8d8c0' }} />
-                </div>
-                <button type="submit" className="w-full py-3 rounded-full text-white font-semibold text-sm hover:opacity-90 transition-opacity"
-                  style={{ backgroundColor: '#0097b2' }}>
-                  Envoyer une demande
-                </button>
-                <p className="text-xs text-center" style={{ color: '#979797' }}>Sans engagement · Confirmation sous 24h</p>
-              </form>
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <BookingForm
+                propertyId={property.id}
+                maxGuests={property.max_guests}
+                basePrice={property.base_price ?? 0}
+              />
             </div>
           </div>
         </div>
