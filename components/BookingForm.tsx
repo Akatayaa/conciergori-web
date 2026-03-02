@@ -131,7 +131,11 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
             <div className="absolute z-50 left-0 mt-2 rounded-2xl shadow-2xl bg-white border overflow-hidden"
               style={{ borderColor: '#e8d8c0', minWidth: 300 }}>
               <style>{`
-                .rdp { --rdp-accent-color: #0097b2; --rdp-accent-background-color: #e0f5f9; font-family: inherit; padding: 12px; }
+                .rdp { --rdp-accent-color: #0097b2; --rdp-accent-background-color: #e0f5f9; font-family: inherit; }
+                .rdp-root { padding: 16px; }
+                .rdp-month { padding-top: 8px; }
+                .rdp-month_caption { padding: 0 0 8px 0; }
+                .rdp-nav { padding: 0 4px; }
                 .rdp-day_button { border-radius: 50%; }
                 .rdp-selected .rdp-day_button { background: #0097b2 !important; color: white; }
                 .rdp-range_middle .rdp-day_button { background: #e0f5f9 !important; color: #00243f; border-radius: 0; }
