@@ -131,12 +131,20 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
             <div className="absolute z-50 left-0 mt-2 rounded-2xl shadow-2xl bg-white border overflow-hidden"
               style={{ borderColor: '#e8d8c0', minWidth: 300 }}>
               <style>{`
-                .rdp { --rdp-accent-color: #0097b2; --rdp-accent-background-color: #e0f5f9; font-family: inherit; }
+                .rdp { --rdp-accent-color: #0097b2; --rdp-accent-background-color: #e0f5f9; font-family: inherit; padding: 12px; }
                 .rdp-day_button { border-radius: 50%; }
                 .rdp-selected .rdp-day_button { background: #0097b2 !important; color: white; }
                 .rdp-range_middle .rdp-day_button { background: #e0f5f9 !important; color: #00243f; border-radius: 0; }
                 .rdp-range_start .rdp-day_button, .rdp-range_end .rdp-day_button { background: #0097b2 !important; color: white; }
-                .rdp-disabled .rdp-day_button { color: #ddd !important; text-decoration: line-through; background: #fafafa !important; cursor: not-allowed; }
+                .rdp-disabled .rdp-day_button {
+                  color: #e07070 !important;
+                  text-decoration: line-through;
+                  text-decoration-color: #e07070;
+                  background: #fff0f0 !important;
+                  cursor: not-allowed;
+                  opacity: 1 !important;
+                  font-weight: 500;
+                }
               `}</style>
               <DayPicker
                 locale={fr}
