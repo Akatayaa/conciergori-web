@@ -113,6 +113,58 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ── LOGEMENTS ─────────────────────────────────────────────────── */}
+      <section id="logements" className="py-20 md:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-[var(--font-suez)] text-3xl md:text-4xl mb-3" style={{ color: '#00243f' }}>
+              Nos logements
+            </h2>
+            <p className="text-base max-w-xl mx-auto" style={{ color: '#979797' }}>
+              Des appartements et maisons soigneusement sélectionnés au cœur de Caen et en bord de mer.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            {(properties ?? []).map(prop => (
+              <Link key={prop.id} href={`/logements/${prop.id}`}
+                className="group rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white border"
+                style={{ borderColor: '#f0e8da' }}>
+                {prop.cover_image ? (
+                  <div className="h-52 overflow-hidden">
+                    <img src={prop.cover_image} alt={prop.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  </div>
+                ) : (
+                  <div className="h-52 flex items-center justify-center text-4xl" style={{ backgroundColor: '#fff2e0' }}>🏠</div>
+                )}
+                <div className="p-4">
+                  <h3 className="font-semibold text-base leading-snug mb-1 truncate" style={{ color: '#00243f' }}>{prop.name}</h3>
+                  <p className="text-xs mb-3 truncate" style={{ color: '#979797' }}>{prop.address}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs" style={{ color: '#979797' }}>
+                      {prop.bedrooms > 0 && <span>🛏 {prop.bedrooms} ch.</span>}
+                      {prop.max_guests > 0 && <span>👤 {prop.max_guests} pers.</span>}
+                    </div>
+                    {prop.base_price > 0 && (
+                      <span className="font-bold text-sm" style={{ color: '#00243f' }}>{prop.base_price}€<span className="font-normal text-xs" style={{ color: '#979797' }}>/nuit</span></span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <Link href="/logements"
+              className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm border-2 transition-colors hover:bg-[#00243f] hover:text-white"
+              style={{ borderColor: '#00243f', color: '#00243f' }}>
+              Voir tous les logements →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── 3. SERVICES GRID ──────────────────────────────────────────── */}
       <section id="services" className="py-20 md:py-28" style={{ backgroundColor: 'rgba(115,199,214,0.12)' }}>
         <div className="max-w-6xl mx-auto px-6">
