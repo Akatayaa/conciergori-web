@@ -18,6 +18,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
   const [guestEmail, setGuestEmail] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
   const [guestAirbnb, setGuestAirbnb] = useState('')
+  const [conflictError, setConflictError] = useState<string | null>(null)
   const [breakdown, setBreakdown] = useState<{
     nights: number; basePrice: number; subtotal: number; finalPrice: number; pricePerNight: number;
     appliedRules: { name: string; effect: string; delta: number }[];
@@ -48,6 +49,22 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  // Valider que le range ne contient pas de dates bloquées
+  useEffect(() => {
+    if (!range?.from || !range?.to) { setConflictError(null); return }
+    const blocked = blockedDates.map(d => d.toDateString())
+    const current = new Date(range.from)
+    current.setDate(current.getDate() + 1) // on exclut check-in et check-out (jours de transition)
+    while (current < range.to) {
+      if (blocked.includes(current.toDateString())) {
+        setConflictError("Ces dates incluent des jours déjà réservés. Veuillez choisir d'autres dates.")
+        return
+      }
+      current.setDate(current.getDate() + 1)
+    }
+    setConflictError(null)
+  }, [range, blockedDates])
 
   // Calcul du prix dynamique avec règles tarifaires
   useEffect(() => {
@@ -249,6 +266,12 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
 
         {status === 'error' && <p className="text-xs text-red-500">{errorMsg}</p>}
 
+        {conflictError && (
+          <div className="rounded-xl px-4 py-3 text-sm font-medium" style={{ backgroundColor: '#fee2e2', color: '#dc2626' }}>
+            ⚠️ {conflictError}
+          </div>
+        )}
+
         {/* Récapitulatif prix */}
         {breakdown && (
           <div className="rounded-xl p-4 text-sm" style={{ backgroundColor: '#fff2e0' }}>
@@ -273,7 +296,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         )}
 
         <button type="submit"
-          disabled={status === 'loading' || !range?.from || !range?.to}
+          disabled={status === 'loading' || !range?.from || !range?.to || !!conflictError}
           className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity disabled:opacity-40"
           style={{ backgroundColor: '#0097b2' }}>
           {status === 'loading' ? 'Envoi en cours…' : 'Envoyer une demande'}

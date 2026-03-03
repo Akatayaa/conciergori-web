@@ -11,6 +11,32 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { property_id, guest_name, guest_email, guest_phone, guest_airbnb_url, check_in, check_out, guests } = body
 
+    // Vérifier conflits (dates bloquées iCal + réservations confirmées)
+    const { data: existing } = await supabase
+      .from('bookings')
+      .select('check_in, check_out')
+      .eq('property_id', property_id)
+      .eq('status', 'confirmed')
+      .or(`and(check_in.lt.${check_out},check_out.gt.${check_in})`)
+    if (existing && existing.length > 0) {
+      return NextResponse.json({ error: 'Ces dates sont déjà réservées.' }, { status: 409 })
+    }
+
+    // Vérifier iCal
+    const { data: prop } = await supabase.from('properties').select('ical_url').eq('id', property_id).single()
+    if (prop?.ical_url) {
+      const { data: avail } = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'https://conciergori-web.vercel.app'}/api/availability?property_id=${property_id}`).then(r => r.json()).catch(() => ({ blocked: [] }))
+      const blocked: string[] = avail?.blocked ?? []
+      const ci = new Date(check_in), co = new Date(check_out)
+      const d = new Date(ci); d.setDate(d.getDate() + 1)
+      while (d < co) {
+        if (blocked.includes(d.toISOString().split('T')[0])) {
+          return NextResponse.json({ error: 'Ces dates incluent des jours bloqués sur Airbnb.' }, { status: 409 })
+        }
+        d.setDate(d.getDate() + 1)
+      }
+    }
+
     // Validation basique
     if (!property_id || !guest_name || !guest_email || !check_in || !check_out) {
       return NextResponse.json({ error: 'Champs manquants' }, { status: 400 })
