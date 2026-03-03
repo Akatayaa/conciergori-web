@@ -1,5 +1,19 @@
 import Link from 'next/link'
-export default function LandingPage() {
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+export default async function LandingPage() {
+  const { data: properties } = await supabase
+    .from('properties')
+    .select('id, name, address, cover_image, base_price, max_guests, bedrooms')
+    .eq('tenant_id', '67b8314e-ce88-467a-9246-cb0558402e34')
+    .order('name')
+    .limit(6)
+
   return (
     <div className="font-[var(--font-quicksand)]" style={{ color: '#4b4b4b' }}>
 
