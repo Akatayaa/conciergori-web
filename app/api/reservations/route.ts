@@ -9,7 +9,7 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { property_id, guest_name, guest_email, guest_phone, check_in, check_out, guests } = body
+    const { property_id, guest_name, guest_email, guest_phone, guest_airbnb_url, check_in, check_out, guests } = body
 
     // Validation basique
     if (!property_id || !guest_name || !guest_email || !check_in || !check_out) {
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
         guest_name,
         guest_email,
         guest_phone: guest_phone || null,
+        guest_airbnb_url: guest_airbnb_url || null,
         check_in,
         check_out,
         total_price: totalPrice,
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
             <p><strong>Voyageur :</strong> ${guest_name}</p>
             <p><strong>Email :</strong> ${guest_email}</p>
             ${guest_phone ? `<p><strong>Téléphone :</strong> ${guest_phone}</p>` : ''}
+            ${guest_airbnb_url ? `<p><strong>Profil Airbnb :</strong> <a href='${guest_airbnb_url}' style='color:#0097b2'>Voir le profil →</a></p>` : ''}
             ${isRepeatGuest ? '<p style="color:#065f46;background:#d1fae5;padding:6px 12px;border-radius:8px;display:inline-block;">⭐ Client fidèle — a déjà réservé chez vous</p>' : ''}
             <p><strong>Arrivée :</strong> ${checkInFr}</p>
             <p><strong>Départ :</strong> ${checkOutFr}</p>

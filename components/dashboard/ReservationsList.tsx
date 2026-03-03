@@ -1,4 +1,5 @@
 'use client'
+import GuestMemo from './GuestMemo'
 
 import { useState } from 'react'
 
@@ -14,6 +15,9 @@ interface Booking {
   property_id: string
   guests?: number
   guest_phone?: string
+  guest_airbnb_url?: string
+  host_rating?: number | null
+  host_memo?: string | null
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -166,6 +170,13 @@ export default function ReservationsList({
                       )}
                     </div>
                   </div>
+                  {/* Mémo hôte — visible sur toutes les résa */}
+                  <GuestMemo
+                    bookingId={b.id}
+                    initialRating={b.host_rating ?? null}
+                    initialMemo={b.host_memo ?? null}
+                    airbnbUrl={b.guest_airbnb_url ?? null}
+                  />
                 </div>
               )
             })}
