@@ -49,6 +49,17 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
+  // Calcul du prix dynamique avec règles tarifaires
+  useEffect(() => {
+    if (!range?.from || !range?.to) { setBreakdown(null); return }
+    const checkIn = range.from.toLocaleDateString('sv-SE') // YYYY-MM-DD en local
+    const checkOut = range.to.toLocaleDateString('sv-SE')
+    fetch(`/api/pricing?property_id=${propertyId}&check_in=${checkIn}&check_out=${checkOut}`)
+      .then(r => r.json())
+      .then(d => setBreakdown(d.basePrice !== undefined ? d : null))
+      .catch(() => setBreakdown(null))
+  }, [range, propertyId])
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
