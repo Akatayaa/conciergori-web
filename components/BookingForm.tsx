@@ -132,7 +132,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
       {/* Prix */}
       <div className="mb-3">
         {basePrice > 0 ? (
-          <><span className="text-3xl font-bold" style={{ color: '#00243f' }}>{basePrice}€</span>
+          <><span className="text-3xl font-bold" style={{ color: '#00243f' }}>{breakdown ? breakdown.pricePerNight : basePrice}€</span>
           <span className="text-sm ml-1" style={{ color: '#979797' }}>/nuit</span></>
         ) : (
           <span className="text-lg font-semibold" style={{ color: '#00243f' }}>Prix sur demande</span>
@@ -282,22 +282,19 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         {breakdown && breakdown.nights > 0 && (
           <div className="rounded-xl p-4 text-sm" style={{ backgroundColor: '#fff2e0' }}>
             <div className="flex justify-between mb-1" style={{ color: '#4b4b4b' }}>
-              <span>{breakdown.basePrice}€ × {breakdown.nights} nuit{breakdown.nights > 1 ? 's' : ''}</span>
-              <span>{breakdown.subtotal}€</span>
+              <span>{breakdown.pricePerNight}€/nuit × {breakdown.nights} nuit{breakdown.nights > 1 ? 's' : ''}</span>
+              <span>{breakdown.finalPrice}€</span>
             </div>
             {breakdown.appliedRules.filter(r => r.delta !== 0 && r.delta < 0).map((r, i) => (
-              <div key={i} className="flex justify-between mb-1" style={{ color: r.delta < 0 ? '#16a34a' : '#dc2626' }}>
+              <div key={i} className="flex justify-between mb-1" style={{ color: '#16a34a' }}>
                 <span>{r.name}</span>
-                <span>{r.delta > 0 ? '+' : ''}{r.delta}€</span>
+                <span>{r.delta}€</span>
               </div>
             ))}
             <div className="flex justify-between font-bold pt-2 border-t mt-2" style={{ borderColor: '#e8d8c0', color: '#00243f' }}>
               <span>Total</span>
               <span>{breakdown.finalPrice}€</span>
             </div>
-            <p className="text-xs mt-1 text-center" style={{ color: '#979797' }}>
-              Soit {breakdown.pricePerNight}€/nuit en moyenne
-            </p>
           </div>
         )}
 
