@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     openGraph: {
       title: property.name,
       description: property.description?.slice(0, 160) ?? `Logement à ${property.address}`,
-      images: property.cover_image ? [{ url: property.cover_image, width: 1200, height: 630 }] : [],
+      images: property.cover_image ? [{ url: `/api/og?url=${encodeURIComponent(property.cover_image)}`, width: 1200, height: 630 }] : [],
     },
   }
 }
