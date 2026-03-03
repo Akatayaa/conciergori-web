@@ -64,8 +64,35 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
             {property.description && (
               <div className="mb-8">
-                <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-3" style={{ color: '#00243f' }}>À propos</h2>
-                <p className="leading-relaxed">{property.description}</p>
+                <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-3" style={{ color: '#00243f' }}>Le logement</h2>
+                <p className="leading-relaxed whitespace-pre-line" style={{ color: '#4b4b4b' }}>{property.description}</p>
+              </div>
+            )}
+
+            {property.amenities && (property.amenities as string[]).length > 0 && (
+              <div className="mb-8">
+                <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-4" style={{ color: '#00243f' }}>Équipements</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {(property.amenities as string[]).map((item: string) => {
+                    const icons: Record<string, string> = {
+                      'Wifi':'📶','Parking':'🅿️','Cuisine':'🍳','Lave-linge':'🫧',
+                      'Sèche-linge':'💨','Télévision':'📺','Climatisation':'❄️',
+                      'Chauffage':'🔥','Piscine':'🏊','Terrasse':'🌿','Balcon':'🪴',
+                      'Ascenseur':'🛗','Lave-vaisselle':'🍽️','Réfrigérateur':'🧊',
+                      'Four':'♨️','Micro-ondes':'📡','Fer à repasser':'👔',
+                      'Bureau':'💼','Baignoire':'🛁','Détecteur de fumée':'🚨',
+                      'Extincteur':'🧯','Animaux acceptés':'🐾','Barbecue':'🔥',
+                      'Jardin':'🌳','Vue sur mer':'🌊'
+                    }
+                    return (
+                      <div key={item} className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm"
+                        style={{ backgroundColor: '#fff2e0' }}>
+                        <span>{icons[item] ?? '✓'}</span>
+                        <span style={{ color: '#4b4b4b' }}>{item}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             )}
 
