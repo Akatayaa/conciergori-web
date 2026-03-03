@@ -49,7 +49,7 @@ export default async function ReservationsPage({ params }: { params: Promise<{ t
               { href: `/${tenantSlug}/dashboard`, label: "🏠 Vue d'ensemble" },
               { href: `/${tenantSlug}/dashboard/logements`, label: '🛏 Logements' },
               { href: `/${tenantSlug}/dashboard/reservations`, label: '📅 Réservations', active: true },
-              { href: `/${tenantSlug}/dashboard/pricing', label: '💰 Prix & règles' },
+              { href: `/${tenantSlug}/dashboard/pricing`, label: '💰 Prix & règles' },
             ].map(item => (
               <Link key={item.href} href={item.href}
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
