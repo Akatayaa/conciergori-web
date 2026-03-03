@@ -41,8 +41,8 @@ export default function Navbar() {
 
         {/* Hamburger */}
         <button onClick={() => setOpen(!open)}
-          className="md:hidden p-2 rounded-md"
-          style={{ color: '#00243f' }}
+          className="md:hidden p-2 rounded-lg"
+          style={{ color: '#00243f', backgroundColor: 'rgba(0,36,63,0.08)' }}
           aria-label="Menu">
           {open ? (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
