@@ -268,20 +268,31 @@ export default function PricingRules({ propertyId, propertyName, initialRules }:
                     style={{ borderColor: '#e8d8c0' }} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>Supplément (%)</label>
-                  <input type="number" min={0} max={300} value={form.markup_pct}
-                    onChange={e => set('markup_pct', +e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
-                    style={{ borderColor: '#e8d8c0' }} />
+              <div>
+                <label className="block text-xs font-semibold mb-2" style={{ color: '#00243f' }}>Type d&apos;ajustement</label>
+                <div className="flex rounded-xl overflow-hidden border mb-3" style={{ borderColor: '#e8d8c0' }}>
+                  <button type="button"
+                    onClick={() => { set('markup_pct', 0); set('discount_pct', form.discount_pct || 10) }}
+                    className={`flex-1 py-2 text-sm font-medium transition-colors ${form.markup_pct === 0 ? 'text-white' : 'text-gray-500 bg-white'}`}
+                    style={{ backgroundColor: form.markup_pct === 0 ? '#16a34a' : undefined }}>
+                    📉 Réduction
+                  </button>
+                  <button type="button"
+                    onClick={() => { set('discount_pct', 0); set('markup_pct', form.markup_pct || 20) }}
+                    className={`flex-1 py-2 text-sm font-medium transition-colors ${form.markup_pct > 0 ? 'text-white' : 'text-gray-500 bg-white'}`}
+                    style={{ backgroundColor: form.markup_pct > 0 ? '#dc2626' : undefined }}>
+                    📈 Supplément (saison haute)
+                  </button>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>OU Réduction (%)</label>
-                  <input type="number" min={0} max={80} value={form.discount_pct}
-                    onChange={e => set('discount_pct', +e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
+                <div className="flex items-center gap-3">
+                  <input type="number" min={1} max={form.markup_pct > 0 ? 300 : 80}
+                    value={form.markup_pct > 0 ? form.markup_pct : form.discount_pct}
+                    onChange={e => form.markup_pct > 0 ? set('markup_pct', +e.target.value) : set('discount_pct', +e.target.value)}
+                    className="w-32 px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
                     style={{ borderColor: '#e8d8c0' }} />
+                  <span className="text-sm font-bold" style={{ color: form.markup_pct > 0 ? '#dc2626' : '#16a34a' }}>
+                    {form.markup_pct > 0 ? `+${form.markup_pct}% sur le prix de base` : `−${form.discount_pct}% sur le prix de base`}
+                  </span>
                 </div>
               </div>
             </div>
