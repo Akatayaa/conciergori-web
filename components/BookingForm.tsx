@@ -44,7 +44,9 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
   // Fermer le calendrier si clic extérieur
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (calRef.current && !calRef.current.contains(e.target as Node)) setShowCal(false)
+      if (calRef.current && !calRef.current.contains(e.target as Node)) {
+        setShowCal(false)
+      }
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -191,7 +193,11 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
                 selected={range}
                 onSelect={(r) => {
                   setRange(r)
-                  if (r?.from && r?.to) setShowCal(false)
+                  // Fermer uniquement quand les deux dates sont sélectionnées
+                  // et que ce n'est pas juste un reset (même date from/to)
+                  if (r?.from && r?.to && r.from.getTime() !== r.to.getTime()) {
+                    setTimeout(() => setShowCal(false), 150)
+                  }
                 }}
                 disabled={[
                   { before: today },
