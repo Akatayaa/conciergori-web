@@ -54,11 +54,11 @@ export default async function LandingPage() {
         {/* Image de fond Caen */}
         <div className="absolute inset-0">
           <img
-            src="/caen-hero.jpg"
+            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=90"
             alt="Caen, vue aérienne"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,36,63,0.62)' }} />
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,36,63,0.72)' }} />
         </div>
         {/* Decorative background */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 70% 50%, rgba(0,151,178,0.08) 0%, transparent 60%)' }} />
