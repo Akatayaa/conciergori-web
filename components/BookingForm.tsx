@@ -211,6 +211,26 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
             style={{ borderColor: '#e8d8c0' }} />
         </div>
 
+        <div>
+          <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>
+            Téléphone <span className="font-normal text-xs" style={{ color: '#979797' }}>(facultatif)</span>
+          </label>
+          <input type="tel" placeholder="+33 6 00 00 00 00" value={guestPhone}
+            onChange={e => setGuestPhone(e.target.value)}
+            className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
+            style={{ borderColor: '#e8d8c0' }} />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold mb-1" style={{ color: '#00243f' }}>
+            Profil Airbnb <span className="font-normal text-xs" style={{ color: '#979797' }}>(facultatif — accélère la confirmation)</span>
+          </label>
+          <input type="url" placeholder="https://www.airbnb.fr/users/show/..." value={guestAirbnb}
+            onChange={e => setGuestAirbnb(e.target.value)}
+            className="w-full px-3 py-2 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
+            style={{ borderColor: '#e8d8c0' }} />
+        </div>
+
         {status === 'error' && <p className="text-xs text-red-500">{errorMsg}</p>}
 
         <button type="submit"
