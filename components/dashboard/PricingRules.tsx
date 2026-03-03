@@ -126,10 +126,10 @@ export default function PricingRules({ propertyId, propertyName, initialRules }:
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-[var(--font-alkatra)] text-lg font-bold" style={{ color: '#00243f' }}>
-          Règles de prix — <span className="font-normal text-base" style={{ color: '#979797' }}>{propertyName}</span>
-        </h3>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs font-semibold" style={{ color: '#979797' }}>
+          {rules.length} règle{rules.length !== 1 ? 's' : ''} configurée{rules.length !== 1 ? 's' : ''}
+        </p>
         <button onClick={() => setShowForm(s => !s)}
           className="px-4 py-2 rounded-xl text-white text-sm font-semibold"
           style={{ backgroundColor: '#0097b2' }}>
