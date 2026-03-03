@@ -50,7 +50,16 @@ export default async function LandingPage() {
       </header>
 
       {/* ── 2. HERO ───────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ backgroundColor: '#fff2e0' }}>
+      <section className="relative overflow-hidden" style={{ backgroundColor: '#00243f' }}>
+        {/* Image de fond Caen */}
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1598197748967-b4674cb3c266?w=1920&q=80"
+            alt="Caen, Normandie"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,36,63,0.62)' }} />
+        </div>
         {/* Decorative background */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 70% 50%, rgba(0,151,178,0.08) 0%, transparent 60%)' }} />
 
@@ -65,13 +74,13 @@ export default async function LandingPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="font-[var(--font-suez)] text-4xl md:text-6xl lg:text-7xl leading-tight mb-6 max-w-4xl" style={{ color: '#00243f' }}>
+          <h1 className="font-[var(--font-suez)] text-4xl md:text-6xl lg:text-7xl leading-tight mb-6 max-w-4xl" style={{ color: '#ffffff' }}>
             Votre conciergerie<br />
             <span style={{ color: '#0097b2' }}>Airbnb à Caen</span>
           </h1>
 
           {/* Subtext */}
-          <p className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed" style={{ color: '#4b4b4b' }}>
+          <p className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
             Réservez directement chez Oriane et <strong>économisez les frais de plateforme Airbnb</strong>.
             Une gestion sur-mesure, une communication directe et des offres exclusives pour votre séjour en Normandie.
           </p>
@@ -106,7 +115,7 @@ export default async function LandingPage() {
             ].map((stat) => (
               <div key={stat.label}>
                 <div className="font-[var(--font-suez)] text-3xl" style={{ color: '#0097b2' }}>{stat.value}</div>
-                <div className="text-sm mt-1" style={{ color: '#4b4b4b' }}>{stat.label}</div>
+                <div className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>{stat.label}</div>
               </div>
             ))}
           </div>
