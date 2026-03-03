@@ -13,6 +13,7 @@ interface Booking {
   created_at: string
   property_id: string
   guests?: number
+  guest_phone?: string
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -129,6 +130,14 @@ export default function ReservationsList({
                           className="text-xs hover:underline" style={{ color: '#0097b2' }}>
                           {b.guest_email}
                         </a>
+                        {b.guest_phone && (
+                          <>
+                            <span className="text-xs" style={{ color: '#e8d8c0' }}>·</span>
+                            <a href={`tel:${b.guest_phone}`} className="text-xs hover:underline" style={{ color: '#0097b2' }}>
+                              {b.guest_phone}
+                            </a>
+                          </>
+                        )}
                         <span className="text-xs" style={{ color: '#e8d8c0' }}>·</span>
                         <span className="text-xs" style={{ color: '#979797' }}>Reçu le {createdAt}</span>
                       </div>

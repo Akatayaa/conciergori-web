@@ -14,14 +14,34 @@ export async function GET(req: NextRequest) {
   const { data: property } = await supabase
     .from('properties').select('ical_url').eq('id', propertyId).single()
 
-  if (!property?.ical_url) {
-    return NextResponse.json({ blocked: [], hasIcal: false })
+  // Dates bloquées depuis Airbnb (iCal)
+  let icalDates: string[] = []
+  const hasIcal = !!property?.ical_url
+  if (hasIcal) {
+    const blocked = await fetchBlockedDates(property.ical_url!)
+    icalDates = getBlockedDateStrings(blocked)
   }
 
-  const blocked = await fetchBlockedDates(property.ical_url)
-  const blockedDates = getBlockedDateStrings(blocked)
+  // Dates bloquées par nos propres réservations confirmées
+  const { data: confirmedBookings } = await supabase
+    .from('bookings')
+    .select('check_in, check_out')
+    .eq('property_id', propertyId)
+    .eq('status', 'confirmed')
 
-  return NextResponse.json({ blocked: blockedDates, hasIcal: true }, {
-    headers: { 'Cache-Control': 's-maxage=3600, stale-while-revalidate' }
+  const bookedDates: string[] = []
+  for (const booking of confirmedBookings ?? []) {
+    const d = new Date(booking.check_in)
+    const end = new Date(booking.check_out)
+    while (d < end) {
+      bookedDates.push(d.toISOString().split('T')[0])
+      d.setDate(d.getDate() + 1)
+    }
+  }
+
+  const allBlocked = [...new Set([...icalDates, ...bookedDates])]
+
+  return NextResponse.json({ blocked: allBlocked, hasIcal }, {
+    headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate' }
   })
 }

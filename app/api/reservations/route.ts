@@ -9,7 +9,7 @@ const supabase = createClient(
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { property_id, guest_name, guest_email, check_in, check_out, guests } = body
+    const { property_id, guest_name, guest_email, guest_phone, check_in, check_out, guests } = body
 
     // Validation basique
     if (!property_id || !guest_name || !guest_email || !check_in || !check_out) {
@@ -34,6 +34,15 @@ export async function POST(req: NextRequest) {
 
     const totalPrice = property.base_price > 0 ? property.base_price * nights : null
 
+    // Détecter repeat guest
+    const { count: prevCount } = await supabase
+      .from('bookings')
+      .select('*', { count: 'exact', head: true })
+      .eq('guest_email', guest_email)
+      .eq('status', 'confirmed')
+
+    const isRepeatGuest = (prevCount ?? 0) > 0
+
     // Sauvegarder en base
     const { data: booking, error: dbError } = await supabase
       .from('bookings')
@@ -42,6 +51,7 @@ export async function POST(req: NextRequest) {
         property_id,
         guest_name,
         guest_email,
+        guest_phone: guest_phone || null,
         check_in,
         check_out,
         total_price: totalPrice,
@@ -79,6 +89,8 @@ export async function POST(req: NextRequest) {
             <hr style="border-color: #e8d8c0;" />
             <p><strong>Voyageur :</strong> ${guest_name}</p>
             <p><strong>Email :</strong> ${guest_email}</p>
+            ${guest_phone ? `<p><strong>Téléphone :</strong> ${guest_phone}</p>` : ''}
+            ${isRepeatGuest ? '<p style="color:#065f46;background:#d1fae5;padding:6px 12px;border-radius:8px;display:inline-block;">⭐ Client fidèle — a déjà réservé chez vous</p>' : ''}
             <p><strong>Arrivée :</strong> ${checkInFr}</p>
             <p><strong>Départ :</strong> ${checkOutFr}</p>
             <p><strong>Durée :</strong> ${nights} nuit${nights > 1 ? 's' : ''}</p>

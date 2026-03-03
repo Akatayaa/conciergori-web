@@ -16,6 +16,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
   const [guests, setGuests] = useState('1')
   const [guestName, setGuestName] = useState('')
   const [guestEmail, setGuestEmail] = useState('')
+  const [guestPhone, setGuestPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [blockedDates, setBlockedDates] = useState<Date[]>([])
