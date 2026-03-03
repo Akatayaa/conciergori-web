@@ -35,9 +35,7 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
 
   const handlePriceBlur = () => {
     const val = parseFloat(price)
-    if (!isNaN(val) && val > 0 && val !== prop.base_price) {
-      save({ base_price: val })
-    }
+    if (!isNaN(val) && val > 0 && val !== prop.base_price) save({ base_price: val })
   }
 
   const handleIcalSave = () => {
@@ -57,8 +55,10 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
         <p className="text-xs mt-0.5" style={{ color: '#979797' }}>{prop.address}</p>
       </div>
 
-      {/* Prix éditable */}
-      <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+      {/* Prix + iCal sur une même ligne */}
+      <div className="flex items-center gap-3 flex-shrink-0">
+
+        {/* Prix */}
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-medium" style={{ color: '#979797' }}>Prix :</span>
           <input
@@ -72,17 +72,13 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
             style={{ borderColor: '#e8d8c0', color: '#00243f' }}
           />
           <span className="text-sm font-medium" style={{ color: '#979797' }}>€</span>
+          {saving && <span className="text-xs" style={{ color: '#0097b2' }}>…</span>}
+          {saved && <span className="text-xs font-semibold text-green-600">✓</span>}
         </div>
-        {(saving || saved) && (
-          <span className={`text-xs font-semibold ${saved ? 'text-green-600' : ''}`}
-            style={saving ? { color: '#0097b2' } : {}}>
-            {saving ? 'Sauvegarde…' : '✓ Sauvegardé'}
-          </span>
-        )}
-      </div>
 
-      {/* iCal */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+        <span style={{ color: '#e8d8c0' }}>|</span>
+
+        {/* iCal */}
         {editIcal ? (
           <div className="flex items-center gap-1">
             <input
@@ -95,18 +91,14 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
               autoFocus
             />
             <button onClick={handleIcalSave}
-              className="px-2 py-1 text-xs rounded-lg text-white" style={{ backgroundColor: '#0097b2' }}>
-              ✓
-            </button>
+              className="px-2 py-1 text-xs rounded-lg text-white" style={{ backgroundColor: '#0097b2' }}>✓</button>
             <button onClick={() => { setIcal(prop.ical_url ?? ''); setEditIcal(false) }}
-              className="px-2 py-1 text-xs rounded-lg" style={{ backgroundColor: '#f0e8da', color: '#979797' }}>
-              ✗
-            </button>
+              className="px-2 py-1 text-xs rounded-lg" style={{ backgroundColor: '#f0e8da', color: '#979797' }}>✗</button>
           </div>
         ) : (
           <button onClick={() => setEditIcal(true)}
             className="flex items-center gap-1.5 text-xs hover:opacity-80 transition-opacity"
-            title={ical || 'Cliquer pour ajouter l\'URL iCal'}>
+            title={ical || "Cliquer pour ajouter l'URL iCal"}>
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ical ? 'bg-green-400' : 'bg-amber-300'}`} />
             <span style={{ color: '#979797' }}>{ical ? 'iCal ✓' : 'Ajouter iCal'}</span>
           </button>
