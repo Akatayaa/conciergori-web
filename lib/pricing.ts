@@ -56,23 +56,29 @@ export function calculatePrice(
     if (rule.rule_type === 'period') {
       const from = new Date(rule.params.date_from as string)
       const to = new Date(rule.params.date_to as string)
-      // S'applique si le séjour chevauche la période
-      if (checkIn <= to && checkOut >= from) {
+      // Calculer le nombre de nuits qui chevauchent réellement la période
+      const overlapStart = checkIn > from ? checkIn : from
+      const overlapEnd = checkOut < to ? checkOut : to
+      const overlapNights = Math.max(0, Math.round((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24)))
+      if (overlapNights > 0) {
+        const overlapSubtotal = basePrice * overlapNights
         if (rule.markup_pct) {
-          adjustmentPct += rule.markup_pct
+          const delta = Math.round(overlapSubtotal * rule.markup_pct / 100)
           appliedRules.push({
             name: `Période haute (+${rule.markup_pct}%)`,
-            effect: `${from.toLocaleDateString('fr')} – ${to.toLocaleDateString('fr')}`,
-            delta: Math.round(subtotal * rule.markup_pct / 100),
+            effect: `${overlapNights} nuit${overlapNights > 1 ? 's' : ''} en période`,
+            delta,
           })
+          // Ajustement en euros directement (pas en %)
+          adjustmentPct += (delta / subtotal) * 100
         } else if (rule.discount_pct) {
-          const pct = -(rule.discount_pct)
-          adjustmentPct += pct
+          const delta = -Math.round(overlapSubtotal * rule.discount_pct / 100)
           appliedRules.push({
             name: `Période basse (−${rule.discount_pct}%)`,
-            effect: `${from.toLocaleDateString('fr')} – ${to.toLocaleDateString('fr')}`,
-            delta: Math.round(subtotal * pct / 100),
+            effect: `${overlapNights} nuit${overlapNights > 1 ? 's' : ''} en période`,
+            delta,
           })
+          adjustmentPct += (delta / subtotal) * 100
         }
       }
     }
