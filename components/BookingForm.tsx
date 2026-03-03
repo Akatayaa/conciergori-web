@@ -19,6 +19,10 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
   const [guestPhone, setGuestPhone] = useState('')
   const [guestAirbnb, setGuestAirbnb] = useState('')
   const [conflictError, setConflictError] = useState<string | null>(null)
+  const [pricingRules, setPricingRules] = useState<Array<{
+    rule_type: string; params: Record<string,unknown>;
+    discount_pct: number|null; markup_pct: number|null; enabled: boolean
+  }>>([])
   const [breakdown, setBreakdown] = useState<{
     nights: number; basePrice: number; subtotal: number; finalPrice: number; pricePerNight: number;
     appliedRules: { name: string; effect: string; delta: number }[];
@@ -51,6 +55,32 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  // Charger les règles de prix pour affichage dans le calendrier
+  useEffect(() => {
+    fetch(`/api/pricing-rules?property_id=${propertyId}`)
+      .then(r => r.json())
+      .then(d => Array.isArray(d) ? setPricingRules(d.filter((r:{enabled:boolean}) => r.enabled)) : null)
+      .catch(() => null)
+  }, [propertyId])
+
+  // Calcul du prix d'une nuit selon les règles de période
+  const getDayPrice = (day: Date): number | null => {
+    if (basePrice <= 0) return null
+    let pct = 0
+    for (const r of pricingRules) {
+      if (r.rule_type === 'period') {
+        const from = new Date(r.params.date_from as string)
+        const to = new Date(r.params.date_to as string)
+        if (day >= from && day <= to) {
+          if (r.markup_pct) pct += r.markup_pct
+          else if (r.discount_pct) pct -= r.discount_pct
+        }
+      }
+    }
+    if (pct === 0) return null // pas de règle → on n'affiche rien (évite le bruit)
+    return Math.round(basePrice * (1 + pct / 100))
+  }
 
   // Valider que le range ne contient pas de dates bloquées
   useEffect(() => {
@@ -200,6 +230,29 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
                   // et que ce n'est pas juste un reset (même date from/to)
                   if (r?.from && r?.to && r.from.getTime() !== r.to.getTime()) {
                     setTimeout(() => setShowCal(false), 150)
+                  }
+                }}
+                components={{
+                  Day: ({ day, modifiers, ...props }) => {
+                    const price = getDayPrice(day.date)
+                    const isBlocked = modifiers.disabled
+                    const isSelected = modifiers.selected
+                    const isRange = modifiers.range_middle
+                    return (
+                      <td {...props} className={props.className}>
+                        <div className="relative flex flex-col items-center justify-center w-full h-full min-h-[2.5rem]">
+                          <span className={`text-sm ${isBlocked ? 'line-through opacity-40' : ''}`}>
+                            {day.date.getDate()}
+                          </span>
+                          {price && !isBlocked && (
+                            <span className="text-[9px] leading-tight font-medium"
+                              style={{ color: isSelected || isRange ? 'rgba(255,255,255,0.85)' : price > basePrice ? '#dc2626' : '#16a34a' }}>
+                              {price}€
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    )
                   }
                 }}
                 disabled={[
