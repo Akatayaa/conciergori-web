@@ -58,9 +58,9 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
       </div>
 
       {/* Prix éditable */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-xs font-medium" style={{ color: '#979797' }}>Prix :</span>
-        <div className="relative">
+      <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-medium" style={{ color: '#979797' }}>Prix :</span>
           <input
             type="number"
             value={price}
@@ -71,10 +71,12 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
             className="w-20 px-2 py-1 text-sm rounded-lg border text-center transition-colors focus:outline-none focus:border-[#0097b2]"
             style={{ borderColor: '#e8d8c0', color: '#00243f' }}
           />
-          <span className="absolute -right-5 top-1/2 -translate-y-1/2 text-xs" style={{ color: '#979797' }}>€</span>
+          <span className="text-sm font-medium" style={{ color: '#979797' }}>€</span>
         </div>
-        {saving && <span className="text-xs" style={{ color: '#0097b2' }}>…</span>}
-        {saved && <span className="text-xs text-green-500">✓</span>}
+        <div className="h-4 text-right">
+          {saving && <span className="text-xs" style={{ color: '#0097b2' }}>Sauvegarde…</span>}
+          {saved && <span className="text-xs font-semibold text-green-600">✓ Sauvegardé</span>}
+        </div>
       </div>
 
       {/* iCal */}
