@@ -134,8 +134,14 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
       <div className="mb-3">
         {basePrice > 0 ? (
           <>
-            {!breakdown && <span className="text-xs font-medium mb-0.5 block" style={{ color: '#979797' }}>À partir de</span>}
-            <span className="text-3xl font-bold" style={{ color: '#00243f' }}>{breakdown ? breakdown.pricePerNight : basePrice}€</span>
+            {/* Prix : effectif si dates sélectionnées, sinon prix de base */}
+            {breakdown
+              ? <span className="text-3xl font-bold" style={{ color: '#00243f' }}>{breakdown.pricePerNight}€</span>
+              : <>
+                  <span className="text-xs font-medium mb-0.5 block" style={{ color: '#979797' }}>À partir de</span>
+                  <span className="text-3xl font-bold" style={{ color: '#00243f' }}>{basePrice}€</span>
+                </>
+            }
             <span className="text-sm ml-1" style={{ color: '#979797' }}>/nuit</span>
           </>
         ) : (
