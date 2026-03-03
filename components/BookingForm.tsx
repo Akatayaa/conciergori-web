@@ -85,7 +85,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
       <div className="rounded-3xl p-8 shadow-lg bg-white text-center">
         <div className="text-5xl mb-4">🎉</div>
         <h3 className="font-bold text-lg mb-2" style={{ color: '#00243f' }}>Demande envoyée !</h3>
-        <p className="text-sm" style={{ color: '#4b4b4b' }}>Oriane vous contactera sous 24h pour confirmer.</p>
+        <p className="text-sm" style={{ color: '#4b4b4b' }}>Notre équipe vous contactera sous 24h pour confirmer.</p>
       </div>
     )
   }

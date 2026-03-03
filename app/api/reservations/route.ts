@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
       const checkInFr = checkInDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
       const checkOutFr = checkOutDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
-      // Email à Oriane
+      // Email à l'équipe Concierg'ori
       await resend.emails.send({
         from: 'Concierg\'ori <onboarding@resend.dev>',
         to: hostEmail,
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
               <p style="margin: 0;"><strong>${property.name}</strong></p>
               <p style="margin: 8px 0 0; color: #4b4b4b;">Du ${checkInFr} au ${checkOutFr} · ${nights} nuit${nights > 1 ? 's' : ''}</p>
             </div>
-            <p>Oriane vous contactera sous 24h pour confirmer votre réservation.</p>
+            <p>Notre équipe vous contactera sous 24h pour confirmer votre réservation.</p>
             <p style="color: #979797; font-size: 12px;">Concierg'ori · Caen, Normandie</p>
           </div>
         `,
