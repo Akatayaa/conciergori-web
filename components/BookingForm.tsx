@@ -279,13 +279,13 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         )}
 
         {/* Récapitulatif prix */}
-        {breakdown && (
+        {breakdown && breakdown.nights > 0 && (
           <div className="rounded-xl p-4 text-sm" style={{ backgroundColor: '#fff2e0' }}>
             <div className="flex justify-between mb-1" style={{ color: '#4b4b4b' }}>
               <span>{breakdown.basePrice}€ × {breakdown.nights} nuit{breakdown.nights > 1 ? 's' : ''}</span>
               <span>{breakdown.subtotal}€</span>
             </div>
-            {breakdown.appliedRules.map((r, i) => (
+            {breakdown.appliedRules.filter(r => r.delta !== 0 && r.delta < 0).map((r, i) => (
               <div key={i} className="flex justify-between mb-1" style={{ color: r.delta < 0 ? '#16a34a' : '#dc2626' }}>
                 <span>{r.name}</span>
                 <span>{r.delta > 0 ? '+' : ''}{r.delta}€</span>
@@ -302,7 +302,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         )}
 
         <button type="submit"
-          disabled={status === 'loading' || !range?.from || !range?.to || !!conflictError}
+          disabled={status === 'loading' || !range?.from || !range?.to || !!conflictError || (range?.from && range?.to && range.from.getTime() === range.to.getTime())}
           className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity disabled:opacity-40"
           style={{ backgroundColor: '#0097b2' }}>
           {status === 'loading' ? 'Envoi en cours…' : 'Envoyer une demande'}
