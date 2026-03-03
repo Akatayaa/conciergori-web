@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 
 type RuleType = 'last_minute' | 'period' | 'long_stay' | 'floor_price'
@@ -47,6 +46,7 @@ export default function PricingRules({ propertyId, propertyName, initialRules }:
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }))
 
@@ -79,6 +79,22 @@ export default function PricingRules({ propertyId, propertyName, initialRules }:
   }
 
   const saveRule = async () => {
+    if (editingId) {
+      setSaving(true)
+      const rule = buildRule()
+      await fetch('/api/pricing-rules/' + editingId, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rule),
+      })
+      setRules(r => r.map(x => x.id === editingId ? { ...x, ...rule, id: editingId } : x))
+      setShowForm(false)
+      setEditingId(null)
+      setForm(emptyForm)
+      setSaving(false)
+      return
+    }
+  // NEW RULE:
     setSaving(true)
     const rule = buildRule()
     const res = await fetch('/api/pricing-rules', {
@@ -156,6 +172,24 @@ export default function PricingRules({ propertyId, propertyName, initialRules }:
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button onClick={() => {
+                  const r2 = rules.find(x => x.id === r.id)!
+                  setForm({
+                    name: r2.name,
+                    rule_type: r2.rule_type,
+                    days_before: (r2.params.days_before as number) ?? 3,
+                    discount_pct: r2.discount_pct ?? 15,
+                    markup_pct: r2.markup_pct ?? 0,
+                    floor_price: r2.floor_price ?? 0,
+                    date_from: (r2.params.date_from as string) ?? '',
+                    date_to: (r2.params.date_to as string) ?? '',
+                    min_nights: (r2.params.min_nights as number) ?? 7,
+                    priority: r2.priority ?? 5,
+                  })
+                  setEditingId(r2.id)
+                  setShowForm(true)
+                }}
+                className="text-xs px-2 py-1 rounded-lg hover:bg-blue-50 text-[#0097b2] hover:text-[#007a91]">✏️</button>
               <button onClick={() => toggleRule(r.id, !r.enabled)}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${r.enabled ? 'bg-[#0097b2]' : 'bg-gray-300'}`}>
                 <span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${r.enabled ? 'translate-x-4' : 'translate-x-1'}`} />
@@ -170,7 +204,7 @@ export default function PricingRules({ propertyId, propertyName, initialRules }:
       {/* Formulaire d'ajout */}
       {showForm && (
         <div className="p-5 rounded-2xl border" style={{ borderColor: '#e8d8c0', backgroundColor: '#fff8f0' }}>
-          <h4 className="font-semibold mb-4 text-sm" style={{ color: '#00243f' }}>Nouvelle règle</h4>
+          <h4 className="font-semibold mb-4 text-sm" style={{ color: '#00243f' }}>{editingId ? '✏️ Modifier la règle' : 'Nouvelle règle'}</h4>
 
           {/* Type */}
           <div className="grid grid-cols-2 gap-2 mb-4">
@@ -286,7 +320,7 @@ export default function PricingRules({ propertyId, propertyName, initialRules }:
             <button onClick={saveRule} disabled={saving}
               className="px-5 py-2 rounded-xl text-white text-sm font-semibold disabled:opacity-50"
               style={{ backgroundColor: '#00243f' }}>
-              {saving ? 'Enregistrement…' : 'Enregistrer la règle'}
+              {saving ? 'Enregistrement…' : editingId ? 'Mettre à jour' : 'Enregistrer la règle'}
             </button>
             <button onClick={() => { setShowForm(false); setForm(emptyForm) }}
               className="px-4 py-2 rounded-xl text-sm"
