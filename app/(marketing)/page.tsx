@@ -131,12 +131,12 @@ export default async function LandingPage() {
                 className="group rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white border"
                 style={{ borderColor: '#f0e8da' }}>
                 {prop.cover_image ? (
-                  <div className="h-52 overflow-hidden">
+                  <div className="h-64 overflow-hidden">
                     <img src={prop.cover_image} alt={prop.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   </div>
                 ) : (
-                  <div className="h-52 flex items-center justify-center text-4xl" style={{ backgroundColor: '#fff2e0' }}>🏠</div>
+                  <div className="h-64 flex items-center justify-center text-4xl" style={{ backgroundColor: '#fff2e0' }}>🏠</div>
                 )}
                 <div className="p-4">
                   <h3 className="font-semibold text-base leading-snug mb-1 truncate" style={{ color: '#00243f' }}>{prop.name}</h3>
