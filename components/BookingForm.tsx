@@ -18,6 +18,11 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
   const [guestEmail, setGuestEmail] = useState('')
   const [guestPhone, setGuestPhone] = useState('')
   const [guestAirbnb, setGuestAirbnb] = useState('')
+  const [breakdown, setBreakdown] = useState<{
+    nights: number; basePrice: number; subtotal: number; finalPrice: number; pricePerNight: number;
+    appliedRules: { name: string; effect: string; delta: number }[];
+    totalDiscount: number; totalMarkup: number;
+  } | null>(null)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [blockedDates, setBlockedDates] = useState<Date[]>([])
@@ -232,6 +237,29 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
         </div>
 
         {status === 'error' && <p className="text-xs text-red-500">{errorMsg}</p>}
+
+        {/* Récapitulatif prix */}
+        {breakdown && (
+          <div className="rounded-xl p-4 text-sm" style={{ backgroundColor: '#fff2e0' }}>
+            <div className="flex justify-between mb-1" style={{ color: '#4b4b4b' }}>
+              <span>{breakdown.basePrice}€ × {breakdown.nights} nuit{breakdown.nights > 1 ? 's' : ''}</span>
+              <span>{breakdown.subtotal}€</span>
+            </div>
+            {breakdown.appliedRules.map((r, i) => (
+              <div key={i} className="flex justify-between mb-1" style={{ color: r.delta < 0 ? '#16a34a' : '#dc2626' }}>
+                <span>{r.name}</span>
+                <span>{r.delta > 0 ? '+' : ''}{r.delta}€</span>
+              </div>
+            ))}
+            <div className="flex justify-between font-bold pt-2 border-t mt-2" style={{ borderColor: '#e8d8c0', color: '#00243f' }}>
+              <span>Total</span>
+              <span>{breakdown.finalPrice}€</span>
+            </div>
+            <p className="text-xs mt-1 text-center" style={{ color: '#979797' }}>
+              Soit {breakdown.pricePerNight}€/nuit en moyenne
+            </p>
+          </div>
+        )}
 
         <button type="submit"
           disabled={status === 'loading' || !range?.from || !range?.to}
