@@ -103,13 +103,11 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
             <span style={{ color: '#979797' }}>{ical ? 'iCal ✓' : 'Ajouter iCal'}</span>
           </button>
         )}
-      <div className="mt-3 pt-3 border-t flex justify-end" style={{ borderColor: '#f0e8da' }}>
-        <Link href={`/conciergori/dashboard/pricing`}
-          className="text-xs px-3 py-1.5 rounded-lg font-medium hover:opacity-80 transition-opacity"
+        <Link href="/conciergori/dashboard/pricing"
+          className="ml-3 text-xs px-3 py-1.5 rounded-lg font-medium hover:opacity-80"
           style={{ backgroundColor: '#fff2e0', color: '#0097b2' }}>
           💰 Règles de prix
         </Link>
-      </div>
       </div>
     </div>
   )
