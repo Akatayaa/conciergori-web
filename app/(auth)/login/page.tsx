@@ -3,7 +3,6 @@
 import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
 
 function LoginForm() {
   const router = useRouter()
@@ -31,65 +30,52 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#fff2e0' }}>
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6"
+      style={{ backgroundColor: '#fff2e0' }}>
 
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 bg-white shadow-sm">
-            <img src="/logo.svg" alt="Concierg'ori" className="w-10 h-10" />
-          </div>
-          <h1 className="font-[var(--font-suez)] text-xl" style={{ color: '#00243f' }}>Concierg'ori</h1>
-          <p className="text-xs mt-0.5" style={{ color: '#979797' }}>Accès tableau de bord</p>
-        </div>
-
-        {/* Card */}
-        <div className="bg-white rounded-3xl shadow-lg p-6">
-          <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-4" style={{ color: '#00243f' }}>
-            Connexion
-          </h2>
-
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div>
-              <label className="block text-xs font-semibold mb-1.5" style={{ color: '#00243f' }}>Email</label>
-              <input
-                type="email" required value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="vous@exemple.com"
-                className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2] transition-colors"
-                style={{ borderColor: '#e8d8c0' }}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold mb-1.5" style={{ color: '#00243f' }}>Mot de passe</label>
-              <input
-                type="password" required value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2] transition-colors"
-                style={{ borderColor: '#e8d8c0' }}
-              />
-            </div>
-
-            {error && (
-              <div className="px-4 py-3 rounded-xl text-sm text-red-700" style={{ backgroundColor: '#fff0f0' }}>
-                {error}
-              </div>
-            )}
-
-            <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity disabled:opacity-50 mt-2"
-              style={{ backgroundColor: '#0097b2' }}>
-              {loading ? 'Connexion…' : 'Se connecter'}
-            </button>
-          </form>
-        </div>
-
-        <p className="text-center text-xs mt-6" style={{ color: '#979797' }}>
-          Concierg'ori · Espace privé
-        </p>
+      {/* Logo + titre */}
+      <div className="text-center mb-8">
+        <img src="/logo.svg" alt="Concierg'ori" className="w-12 h-12 mx-auto mb-3" />
+        <h1 className="font-[var(--font-suez)] text-2xl" style={{ color: '#00243f' }}>Concierg'ori</h1>
+        <p className="text-sm mt-1" style={{ color: '#979797' }}>Espace de gestion</p>
       </div>
+
+      {/* Formulaire directement sur le fond */}
+      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
+        <div>
+          <label className="block text-xs font-semibold mb-1.5" style={{ color: '#00243f' }}>Email</label>
+          <input
+            type="email" required value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="vous@exemple.com"
+            className="w-full px-4 py-3 rounded-2xl border text-sm bg-white focus:outline-none focus:border-[#0097b2] transition-colors"
+            style={{ borderColor: '#e8d8c0' }}
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold mb-1.5" style={{ color: '#00243f' }}>Mot de passe</label>
+          <input
+            type="password" required value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className="w-full px-4 py-3 rounded-2xl border text-sm bg-white focus:outline-none focus:border-[#0097b2] transition-colors"
+            style={{ borderColor: '#e8d8c0' }}
+          />
+        </div>
+
+        {error && (
+          <p className="text-sm text-red-600 text-center">{error}</p>
+        )}
+
+        <button type="submit" disabled={loading}
+          className="w-full py-3 rounded-full text-white font-semibold text-sm transition-opacity disabled:opacity-50"
+          style={{ backgroundColor: '#0097b2' }}>
+          {loading ? 'Connexion…' : 'Se connecter'}
+        </button>
+      </form>
+
+      <p className="text-xs mt-8" style={{ color: '#979797' }}>Séjour · Espace privé</p>
     </div>
   )
 }
