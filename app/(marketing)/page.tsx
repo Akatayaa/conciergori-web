@@ -114,9 +114,10 @@ export default async function LandingPage() {
       </section>
 
       {/* ── LOGEMENTS ─────────────────────────────────────────────────── */}
-      <section id="logements" className="py-20 md:py-24 bg-white">
+      <section id="logements" className="py-20 md:py-24" style={{ backgroundColor: '#fff2e0' }}>
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#0097b2' }}>Où séjourner</p>
             <h2 className="font-[var(--font-suez)] text-3xl md:text-4xl mb-3" style={{ color: '#00243f' }}>
               Nos logements
             </h2>
@@ -128,26 +129,27 @@ export default async function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {(properties ?? []).map(prop => (
               <Link key={prop.id} href={`/logements/${prop.id}`}
-                className="group rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white border"
-                style={{ borderColor: '#f0e8da' }}>
+                className="group rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white">
                 {prop.cover_image ? (
-                  <div className="h-64 overflow-hidden">
+                  <div className="h-56 overflow-hidden">
                     <img src={prop.cover_image} alt={prop.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                 ) : (
-                  <div className="h-64 flex items-center justify-center text-4xl" style={{ backgroundColor: '#fff2e0' }}>🏠</div>
+                  <div className="h-56 flex items-center justify-center text-4xl" style={{ backgroundColor: '#fff2e0' }}>🏠</div>
                 )}
-                <div className="p-4">
-                  <h3 className="font-semibold text-base leading-snug mb-1 truncate" style={{ color: '#00243f' }}>{prop.name}</h3>
-                  <p className="text-xs mb-3 truncate" style={{ color: '#979797' }}>{prop.address}</p>
+                <div className="p-5">
+                  <h3 className="font-[var(--font-alkatra)] font-bold text-base leading-snug mb-1 truncate" style={{ color: '#00243f' }}>{prop.name}</h3>
+                  <p className="text-xs mb-4 truncate" style={{ color: '#979797' }}>{prop.address}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 text-xs" style={{ color: '#979797' }}>
                       {prop.bedrooms > 0 && <span>🛏 {prop.bedrooms} ch.</span>}
                       {prop.max_guests > 0 && <span>👤 {prop.max_guests} pers.</span>}
                     </div>
-                    {prop.base_price > 0 && (
+                    {prop.base_price > 0 ? (
                       <span className="font-bold text-sm" style={{ color: '#00243f' }}>{prop.base_price}€<span className="font-normal text-xs" style={{ color: '#979797' }}>/nuit</span></span>
+                    ) : (
+                      <span className="text-xs px-3 py-1 rounded-full text-white" style={{ backgroundColor: '#0097b2' }}>Voir</span>
                     )}
                   </div>
                 </div>
@@ -157,8 +159,8 @@ export default async function LandingPage() {
 
           <div className="text-center">
             <Link href="/logements"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm border-2 transition-colors hover:bg-[#00243f] hover:text-white"
-              style={{ borderColor: '#00243f', color: '#00243f' }}>
+              className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: '#0097b2' }}>
               Voir tous les logements →
             </Link>
           </div>
