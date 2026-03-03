@@ -1,3 +1,4 @@
+import LogoutButton from '@/components/dashboard/LogoutButton'
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -64,6 +65,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ tena
           <div className="p-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
             <p className="text-xs text-white/40">{tenant.name}</p>
             <Link href="/" className="text-xs text-[#73c7d6] hover:underline mt-1 block">← Voir le site</Link>
+            <LogoutButton />
           </div>
         </aside>
 
