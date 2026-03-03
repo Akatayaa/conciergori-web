@@ -54,7 +54,7 @@ export default async function LandingPage() {
         {/* Image de fond Caen */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&q=90"
+            src="https://images.unsplash.com/photo-1730882851443-08f3277b4a1b?w=1920&q=90"
             alt="Caen, vue aérienne"
             className="w-full h-full object-cover"
           />
