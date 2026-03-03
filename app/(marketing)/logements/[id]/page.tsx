@@ -1,3 +1,4 @@
+import Navbar from '@/components/Navbar'
 import BookingForm from '@/components/BookingForm'
 import PhotoGallery from '@/components/PhotoGallery'
 import { createClient } from '@supabase/supabase-js'
@@ -26,18 +27,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
          className="font-[var(--font-quicksand)]">
 
       {/* Navbar */}
-      <header className="sticky top-0 z-50" style={{ backgroundColor: '#fff2e0', borderBottom: '1px solid #e8d8c0' }}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/"><img src="/logo.svg" alt="Concierg'ori" className="h-14 w-auto" /></Link>
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/#services" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Services</Link>
-            <Link href="/logements" className="text-sm font-medium text-[#0097b2]">Logements</Link>
-            <Link href="/#contact" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Contact</Link>
-          </nav>
-          <Link href="#reserver" className="px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-            style={{ backgroundColor: '#0097b2' }}>Réserver</Link>
-        </div>
-      </header>
+      <Navbar />
 
       <div className="max-w-5xl mx-auto px-6 py-10">
 
@@ -90,7 +80,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ id: s
 
           {/* Encart réservation */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
+            <div className="lg:sticky lg:top-24">
               <BookingForm
                 propertyId={property.id}
                 maxGuests={property.max_guests}

@@ -1,3 +1,4 @@
+import Navbar from '@/components/Navbar'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
 
@@ -28,21 +29,7 @@ export default async function LogementsPage() {
          className="font-[var(--font-quicksand)]">
 
       {/* Navbar */}
-      <header className="sticky top-0 z-50" style={{ backgroundColor: '#fff2e0', borderBottom: '1px solid #e8d8c0' }}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/"><img src="/logo.svg" alt="Concierg'ori" className="h-14 w-auto" /></Link>
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/#services" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Services</Link>
-            <Link href="/logements" className="text-sm font-medium text-[#0097b2]">Logements</Link>
-            <Link href="/#contact" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Contact</Link>
-          </nav>
-          <Link href="/#contact"
-            className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all"
-            style={{ backgroundColor: '#0097b2' }}>
-            Réserver
-          </Link>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero section */}
       <section className="py-16 px-6 text-center" style={{ backgroundColor: '#00243f' }}>

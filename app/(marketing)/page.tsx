@@ -1,3 +1,4 @@
+import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 
@@ -17,37 +18,7 @@ export default async function LandingPage() {
   return (
     <div className="font-[var(--font-quicksand)]" style={{ color: '#4b4b4b' }}>
 
-      {/* ── 1. NAVBAR ─────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50" style={{ backgroundColor: '#fff2e0', borderBottom: '1px solid #e8d8c0' }}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <a href="#"><img src="/logo.svg" alt="Concierg'ori" className="h-14 w-auto" /></a>
-
-          {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#services" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Services</a>
-            <a href="/logements" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Logements</a>
-            <a href="#tarifs" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Tarifs</a>
-            <a href="#contact" className="text-sm font-medium hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>Contact</a>
-          </nav>
-
-          {/* CTA */}
-          <a
-            href="#contact"
-            className="hidden md:inline-flex items-center px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90 hover:shadow-lg"
-            style={{ backgroundColor: '#0097b2' }}
-          >
-            Réserver directement
-          </a>
-
-          {/* Mobile menu button */}
-          <button className="md:hidden p-2 rounded-md text-white/80">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-      </header>
+      <Navbar />
 
       {/* ── 2. HERO ───────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden" style={{ backgroundColor: '#00243f' }}>
@@ -107,7 +78,7 @@ export default async function LandingPage() {
           </div>
 
           {/* Stats row */}
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 text-center">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-16 text-center mt-8">
             {[
               { value: '15+', label: 'Biens gérés' },
               { value: '200+', label: 'Voyageurs accueillis' },
