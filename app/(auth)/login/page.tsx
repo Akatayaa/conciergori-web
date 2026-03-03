@@ -36,20 +36,20 @@ function LoginForm() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 bg-white shadow-sm">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-3 bg-white shadow-sm">
             <img src="/logo.svg" alt="Concierg'ori" className="w-10 h-10" />
           </div>
-          <h1 className="font-[var(--font-suez)] text-2xl" style={{ color: '#00243f' }}>Concierg'ori</h1>
-          <p className="text-sm mt-1" style={{ color: '#979797' }}>Accès tableau de bord</p>
+          <h1 className="font-[var(--font-suez)] text-xl" style={{ color: '#00243f' }}>Concierg'ori</h1>
+          <p className="text-xs mt-0.5" style={{ color: '#979797' }}>Accès tableau de bord</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-lg p-8">
-          <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-6" style={{ color: '#00243f' }}>
+        <div className="bg-white rounded-3xl shadow-lg p-6">
+          <h2 className="font-[var(--font-alkatra)] text-xl font-bold mb-4" style={{ color: '#00243f' }}>
             Connexion
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
               <label className="block text-xs font-semibold mb-1.5" style={{ color: '#00243f' }}>Email</label>
               <input
