@@ -1,4 +1,16 @@
 import Navbar from '@/components/Navbar'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Locations courte durée à Caen — Réservez directement",
+  description: "Appartements et maisons à Caen et en Normandie. Réservez directement chez Concierg'ori, sans frais Airbnb. Disponibilités en temps réel.",
+  openGraph: {
+    title: "Concierg'ori — Locations à Caen sans frais Airbnb",
+    description: "Réservez directement vos séjours à Caen. Appartements et maisons de qualité, conciergerie locale.",
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+  },
+}
+
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 

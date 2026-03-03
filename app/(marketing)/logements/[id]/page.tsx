@@ -10,6 +10,29 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+  const { data: property } = await supabase
+    .from('properties').select('name, description, cover_image, address').eq('id', id).single()
+
+  if (!property) return { title: 'Logement introuvable' }
+
+  return {
+    title: `${property.name} — Réservation directe`,
+    description: property.description?.slice(0, 160) ?? `${property.name} à ${property.address}. Réservez directement sans frais Airbnb.`,
+    openGraph: {
+      title: property.name,
+      description: property.description?.slice(0, 160) ?? `Logement à ${property.address}`,
+      images: property.cover_image ? [{ url: property.cover_image, width: 1200, height: 630 }] : [],
+    },
+  }
+}
+
 export default async function PropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const { data: property } = await supabase

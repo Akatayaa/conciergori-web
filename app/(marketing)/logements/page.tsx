@@ -1,3 +1,14 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Nos logements — Appartements et maisons à Caen",
+  description: "Découvrez tous nos logements à Caen et en Normandie. Studios, appartements, maisons en bord de mer. Réservez sans frais Airbnb.",
+  openGraph: {
+    title: "Logements à Caen — Concierg'ori",
+    description: "Studios, appartements et maisons à Caen et Normandie. Réservation directe, sans frais de plateforme.",
+  },
+}
+
 import Navbar from '@/components/Navbar'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
