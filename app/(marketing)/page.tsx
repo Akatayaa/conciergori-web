@@ -230,7 +230,7 @@ export default async function LandingPage() {
 
             {[
               { step: '01', title: 'Contactez-nous', desc: 'Envoyez-nous un message avec vos dates. On vous répond sous 2h pour confirmer la disponibilité et discuter de votre séjour.' },
-              { step: '02', title: 'On s\'occupe de tout', desc: 'Concierg'ori prépare votre logement : ménage, linge frais, panier d\'accueil et accueil personnalisé à votre arrivée.' },
+              { step: '02', title: 'On s\'occupe de tout', desc: "Concierg'ori prépare votre logement : ménage, linge frais, panier d'accueil et accueil personnalisé à votre arrivée." },
               { step: '03', title: 'Vous encaissez', desc: 'Réglez directement, sans frais de plateforme. Vous profitez d\'un tarif avantageux et d\'un service premium. Simple et transparent.' },
             ].map((item) => (
               <div key={item.step} className="flex flex-col items-center text-center">
@@ -266,13 +266,13 @@ export default async function LandingPage() {
               {
                 icon: '💸',
                 title: 'Pas de frais plateforme',
-                desc: 'Airbnb prélève jusqu\'à 20% de frais voyageur. En réservant directement, vous payez le prix juste — et Concierg'ori gagne plus.',
+                desc: 'Airbnb prélève jusqu\'à 20% de frais voyageur. En réservant directement, vous payez le prix juste — et Concierg\'ori gagne plus.',
                 highlight: 'Économisez jusqu\'à 20%',
               },
               {
                 icon: '💬',
                 title: 'Communication directe',
-                desc: 'Parlez directement à Concierg'ori via WhatsApp ou téléphone. Pas de messagerie filtrée, des réponses rapides et personnalisées.',
+                desc: "Parlez directement à Concierg'ori via WhatsApp ou téléphone. Pas de messagerie filtrée, des réponses rapides et personnalisées.",
                 highlight: 'Réponse en moins de 2h',
               },
               {
@@ -312,7 +312,7 @@ export default async function LandingPage() {
                 location: 'Paris',
                 date: 'Novembre 2024',
                 rating: 5,
-                text: 'Week-end parfait à Caen ! Concierg'ori nous a accueillis avec un panier de produits normands, c\'était une vraie attention. L\'appartement était impeccable. Et sans les frais Airbnb, on a économisé plus de 40€. On reviendra sans hésiter !',
+                text: "Week-end parfait à Caen ! Concierg'ori nous a accueillis avec un panier de produits normands, c'était une vraie attention. L'appartement était impeccable. Et sans les frais Airbnb, on a économisé plus de 40€. On reviendra sans hésiter !",
               },
               {
                 name: 'Thomas L.',
@@ -326,7 +326,7 @@ export default async function LandingPage() {
                 location: 'Bordeaux',
                 date: 'Août 2024',
                 rating: 5,
-                text: 'Vacances en famille avec 3 enfants, Concierg'ori a tout anticipé : lits bébé, Kit de bienvenue pour les petits, conseils sur les activités à Caen. Tarif négocié directement, bien mieux qu\'Airbnb. Une adresse qu\'on garde précieusement !',
+                text: "Vacances en famille avec 3 enfants, Concierg'ori a tout anticipé : lits bébé, Kit de bienvenue pour les petits, conseils sur les activités à Caen. Tarif négocié directement, bien mieux qu'Airbnb. Une adresse qu'on garde précieusement !",
               },
             ].map((testimonial) => (
               <div key={testimonial.name} className="bg-white rounded-2xl p-7 shadow-sm border" style={{ borderColor: 'rgba(115,199,214,0.4)' }}>
