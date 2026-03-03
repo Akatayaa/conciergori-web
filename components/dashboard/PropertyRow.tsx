@@ -73,10 +73,12 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
           />
           <span className="text-sm font-medium" style={{ color: '#979797' }}>€</span>
         </div>
-        <div className="h-4 text-right">
-          {saving && <span className="text-xs" style={{ color: '#0097b2' }}>Sauvegarde…</span>}
-          {saved && <span className="text-xs font-semibold text-green-600">✓ Sauvegardé</span>}
-        </div>
+        {(saving || saved) && (
+          <span className={`text-xs font-semibold ${saved ? 'text-green-600' : ''}`}
+            style={saving ? { color: '#0097b2' } : {}}>
+            {saving ? 'Sauvegarde…' : '✓ Sauvegardé'}
+          </span>
+        )}
       </div>
 
       {/* iCal */}
