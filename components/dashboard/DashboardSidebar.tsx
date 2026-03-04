@@ -12,6 +12,7 @@ interface DashboardSidebarProps {
 
 const NAV = [
   { href: 'dashboard',              label: "🏠 Vue d'ensemble" },
+  { href: 'dashboard/logements',    label: '🛏 Logements' },
   { href: 'dashboard/reservations', label: '📅 Réservations' },
   { href: 'dashboard/pricing',      label: '💰 Prix & règles' },
 ]
