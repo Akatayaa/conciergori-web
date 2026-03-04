@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/checkin-reminders?secret=22e0fad09e690fc7b6ab45bae2a75849",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}
