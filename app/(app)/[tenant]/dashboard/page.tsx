@@ -1,3 +1,4 @@
+import StatsCA from '@/components/dashboard/StatsCA'
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import PropertyRow from '@/components/dashboard/PropertyRow'
@@ -24,6 +25,13 @@ export default async function DashboardPage({ params }: { params: Promise<{ tena
 
   const totalProps = properties?.length ?? 0
   const pendingBookings = bookings?.length ?? 0
+
+  const { data: allBookings } = await supabase
+    .from('bookings').select('id,check_in,check_out,status,total_price,property_id')
+    .eq('tenant_id', tenant.id).in('status', ['confirmed', 'pending'])
+
+  const propMap2 = Object.fromEntries((properties ?? []).map(p => [p.id, p.name]))
+  const basePriceMap = Object.fromEntries((properties ?? []).map(p => [p.id, p.base_price ?? 0]))
 
   // Map id → name pour BookingsList
   const propMap = Object.fromEntries((properties ?? []).map(p => [p.id, p.name]))
@@ -52,7 +60,16 @@ export default async function DashboardPage({ params }: { params: Promise<{ tena
               ))}
             </div>
 
-            {/* Logements avec prix éditables */}
+            {/* Stats CA */}
+      <div className="mb-8">
+        <StatsCA
+          bookings={(allBookings ?? []).map(b => ({ ...b, property_name: propMap2[b.property_id] }))}
+          basePrice={basePriceMap}
+          propNames={propMap2}
+        />
+      </div>
+
+      {/* Logements avec prix éditables */}
             <div className="rounded-2xl bg-white shadow-sm mb-8">
               <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#f0e8da' }}>
                 <div>

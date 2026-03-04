@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
         guest_airbnb_url: guest_airbnb_url || null,
         check_in,
         check_out,
-        total_price: totalPrice,
+        total_price: body.total_price || null,
         status: 'pending',
         source: 'direct'
       })
