@@ -11,10 +11,11 @@ interface DashboardSidebarProps {
 }
 
 const NAV = [
-  { href: 'dashboard',              label: "🏠 Vue d'ensemble" },
-  { href: 'dashboard/logements',    label: '🛏 Logements' },
-  { href: 'dashboard/reservations', label: '📅 Réservations' },
-  { href: 'dashboard/pricing',      label: '💰 Prix & règles' },
+  { href: 'dashboard',               label: "🏠 Vue d'ensemble" },
+  { href: 'dashboard/logements',     label: '🛏 Logements' },
+  { href: 'dashboard/reservations',  label: '📅 Réservations' },
+  { href: 'dashboard/calendrier',    label: '📆 Calendrier' },
+  { href: 'dashboard/pricing',       label: '💰 Prix & règles' },
 ]
 
 export default function DashboardSidebar({ tenantSlug, tenantName }: DashboardSidebarProps) {
