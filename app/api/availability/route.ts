@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { fetchBlockedDates, getBlockedDateStrings } from '@/lib/ical'
+import { fetchIcalEvents, getBlockedDateStrings } from '@/lib/ical'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 const supabase = createClient(
@@ -9,12 +9,9 @@ const supabase = createClient(
 )
 
 export async function GET(req: NextRequest) {
-  // Rate limiting : 60 req / min par IP
   const ip = getClientIp(req)
   const rl = rateLimit(`availability:${ip}`, { maxRequests: 60, windowMs: 60 * 1000 })
-  if (!rl.allowed) {
-    return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 })
-  }
+  if (!rl.allowed) return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 })
 
   const propertyId = req.nextUrl.searchParams.get('property_id')
   if (!propertyId || !/^[0-9a-f-]{36}$/.test(propertyId)) {
@@ -24,13 +21,16 @@ export async function GET(req: NextRequest) {
   const { data: property } = await supabase
     .from('properties').select('ical_url').eq('id', propertyId).single()
 
-  let icalDates: string[] = []
+  // Événements iCal enrichis
+  let icalEvents: Awaited<ReturnType<typeof fetchIcalEvents>> = []
   const hasIcal = !!property?.ical_url
   if (hasIcal) {
-    const blocked = await fetchBlockedDates(property.ical_url!)
-    icalDates = getBlockedDateStrings(blocked)
+    icalEvents = await fetchIcalEvents(property.ical_url!)
   }
 
+  const icalDates = getBlockedDateStrings(icalEvents.map(e => ({ start: e.start, end: e.end })))
+
+  // Réservations confirmées en DB
   const { data: confirmedBookings } = await supabase
     .from('bookings')
     .select('check_in, check_out')
@@ -49,7 +49,19 @@ export async function GET(req: NextRequest) {
 
   const allBlocked = [...new Set([...icalDates, ...bookedDates])]
 
-  return NextResponse.json({ blocked: allBlocked, hasIcal }, {
+  // Réservations iCal (pour le calendrier dashboard)
+  const reservations = icalEvents
+    .filter(e => e.isReservation)
+    .map(e => ({
+      check_in: e.start.toISOString().split('T')[0],
+      check_out: e.end.toISOString().split('T')[0],
+      source: e.source ?? 'airbnb',
+      booking_ref: e.bookingRef,
+      phone4: e.phone4,
+      summary: e.summary,
+    }))
+
+  return NextResponse.json({ blocked: allBlocked, hasIcal, reservations }, {
     headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate' }
   })
 }
