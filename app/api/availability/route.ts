@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { fetchBlockedDates, getBlockedDateStrings } from '@/lib/ical'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8,13 +9,21 @@ const supabase = createClient(
 )
 
 export async function GET(req: NextRequest) {
+  // Rate limiting : 60 req / min par IP
+  const ip = getClientIp(req)
+  const rl = rateLimit(`availability:${ip}`, { maxRequests: 60, windowMs: 60 * 1000 })
+  if (!rl.allowed) {
+    return NextResponse.json({ error: 'Trop de requêtes' }, { status: 429 })
+  }
+
   const propertyId = req.nextUrl.searchParams.get('property_id')
-  if (!propertyId) return NextResponse.json({ error: 'property_id requis' }, { status: 400 })
+  if (!propertyId || !/^[0-9a-f-]{36}$/.test(propertyId)) {
+    return NextResponse.json({ error: 'property_id invalide' }, { status: 400 })
+  }
 
   const { data: property } = await supabase
     .from('properties').select('ical_url').eq('id', propertyId).single()
 
-  // Dates bloquées depuis Airbnb (iCal)
   let icalDates: string[] = []
   const hasIcal = !!property?.ical_url
   if (hasIcal) {
@@ -22,7 +31,6 @@ export async function GET(req: NextRequest) {
     icalDates = getBlockedDateStrings(blocked)
   }
 
-  // Dates bloquées par nos propres réservations confirmées
   const { data: confirmedBookings } = await supabase
     .from('bookings')
     .select('check_in, check_out')

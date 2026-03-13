@@ -1,161 +1,75 @@
+import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json()
-    const { property_id, guest_name, guest_email, guest_phone, guest_airbnb_url, check_in, check_out, guests } = body
-
-    // Vérifier conflits (dates bloquées iCal + réservations confirmées)
-    const { data: existing } = await supabase
-      .from('bookings')
-      .select('check_in, check_out')
-      .eq('property_id', property_id)
-      .eq('status', 'confirmed')
-      .or(`and(check_in.lt.${check_out},check_out.gt.${check_in})`)
-    if (existing && existing.length > 0) {
-      return NextResponse.json({ error: 'Ces dates sont déjà réservées.' }, { status: 409 })
-    }
-
-    // Vérifier iCal
-    const { data: prop } = await supabase.from('properties').select('ical_url').eq('id', property_id).single()
-    if (prop?.ical_url) {
-      const { data: avail } = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? 'https://conciergori-web.vercel.app'}/api/availability?property_id=${property_id}`).then(r => r.json()).catch(() => ({ blocked: [] }))
-      const blocked: string[] = avail?.blocked ?? []
-      const ci = new Date(check_in), co = new Date(check_out)
-      const d = new Date(ci); d.setDate(d.getDate() + 1)
-      while (d < co) {
-        if (blocked.includes(d.toISOString().split('T')[0])) {
-          return NextResponse.json({ error: 'Ces dates incluent des jours bloqués sur Airbnb.' }, { status: 409 })
-        }
-        d.setDate(d.getDate() + 1)
-      }
-    }
-
-    // Validation basique
-    if (!property_id || !guest_name || !guest_email || !check_in || !check_out) {
-      return NextResponse.json({ error: 'Champs manquants' }, { status: 400 })
-    }
-
-    // Récupérer le logement + tenant
-    const { data: property } = await supabase
-      .from('properties')
-      .select('*, tenants(name, branding_config)')
-      .eq('id', property_id)
-      .single()
-
-    if (!property) return NextResponse.json({ error: 'Logement introuvable' }, { status: 404 })
-
-    // Calculer le nb de nuits
-    const checkInDate = new Date(check_in)
-    const checkOutDate = new Date(check_out)
-    const nights = Math.round((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24))
-
-    if (nights <= 0) return NextResponse.json({ error: 'Dates invalides' }, { status: 400 })
-
-    const totalPrice = property.base_price > 0 ? property.base_price * nights : null
-
-    // Détecter repeat guest
-    const { count: prevCount } = await supabase
-      .from('bookings')
-      .select('*', { count: 'exact', head: true })
-      .eq('guest_email', guest_email)
-      .eq('status', 'confirmed')
-
-    const isRepeatGuest = (prevCount ?? 0) > 0
-
-    // Sauvegarder en base
-    const { data: booking, error: dbError } = await supabase
-      .from('bookings')
-      .insert({
-        tenant_id: property.tenant_id,
-        property_id,
-        guest_name,
-        guest_email,
-        guest_phone: guest_phone || null,
-        guest_airbnb_url: guest_airbnb_url || null,
-        check_in,
-        check_out,
-        total_price: body.total_price || null,
-        status: 'pending',
-        source: 'direct'
-      })
-      .select()
-      .single()
-
-    if (dbError) {
-      console.error('DB error:', dbError)
-      return NextResponse.json({ error: 'Erreur base de données' }, { status: 500 })
-    }
-
-    // Envoyer email si Resend configuré
-    const resendKey = process.env.RESEND_API_KEY
-    const hostEmail = process.env.HOST_EMAIL || 'oriane@conciergori.fr'
-
-    if (resendKey && resendKey !== 'RESEND_KEY_PLACEHOLDER') {
-      const { Resend } = await import('resend')
-      const resend = new Resend(resendKey)
-
-      const checkInFr = checkInDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-      const checkOutFr = checkOutDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-
-      // Email à l'équipe Concierg'ori
-      await resend.emails.send({
-        from: 'Concierg\'ori <onboarding@resend.dev>',
-        to: hostEmail,
-        subject: `📋 Nouvelle demande — ${property.name}`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #00243f;">Nouvelle demande de réservation</h2>
-            <p><strong>Logement :</strong> ${property.name}</p>
-            <hr style="border-color: #e8d8c0;" />
-            <p><strong>Voyageur :</strong> ${guest_name}</p>
-            <p><strong>Email :</strong> ${guest_email}</p>
-            ${guest_phone ? `<p><strong>Téléphone :</strong> ${guest_phone}</p>` : ''}
-            ${guest_airbnb_url ? `<p><strong>Profil Airbnb :</strong> <a href='${guest_airbnb_url}' style='color:#0097b2'>Voir le profil →</a></p>` : ''}
-            ${isRepeatGuest ? '<p style="color:#065f46;background:#d1fae5;padding:6px 12px;border-radius:8px;display:inline-block;">⭐ Client fidèle — a déjà réservé chez vous</p>' : ''}
-            <p><strong>Arrivée :</strong> ${checkInFr}</p>
-            <p><strong>Départ :</strong> ${checkOutFr}</p>
-            <p><strong>Durée :</strong> ${nights} nuit${nights > 1 ? 's' : ''}</p>
-            <p><strong>Voyageurs :</strong> ${guests}</p>
-            ${totalPrice ? `<p><strong>Total estimé :</strong> ${totalPrice}€</p>` : ''}
-            <hr style="border-color: #e8d8c0;" />
-            <p style="color: #979797; font-size: 12px;">Répondre directement à cet email pour contacter le voyageur.</p>
-          </div>
-        `,
-        replyTo: guest_email,
-      })
-
-      // Email de confirmation au voyageur (+ copie hôte en dev sans domaine vérifié)
-      await resend.emails.send({
-        from: 'Concierg\'ori <onboarding@resend.dev>',
-        to: [guest_email, hostEmail],
-        subject: `✅ Demande reçue — ${property.name}`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #00243f;">Votre demande a bien été reçue !</h2>
-            <p>Bonjour ${guest_name},</p>
-            <p>Nous avons bien reçu votre demande pour :</p>
-            <div style="background: #fff2e0; padding: 16px; border-radius: 12px; margin: 16px 0;">
-              <p style="margin: 0;"><strong>${property.name}</strong></p>
-              <p style="margin: 8px 0 0; color: #4b4b4b;">Du ${checkInFr} au ${checkOutFr} · ${nights} nuit${nights > 1 ? 's' : ''}</p>
-            </div>
-            <p>Notre équipe vous contactera sous 24h pour confirmer votre réservation.</p>
-            <p style="color: #979797; font-size: 12px;">Concierg'ori · Caen, Normandie</p>
-          </div>
-        `,
-      })
-    }
-
-    return NextResponse.json({ success: true, booking_id: booking.id })
-
-  } catch (err) {
-    console.error('Reservation error:', err)
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+  // Rate limiting : 5 réservations max / 10 min par IP
+  const ip = getClientIp(req)
+  const rl = rateLimit(`reservations:${ip}`, { maxRequests: 5, windowMs: 10 * 60 * 1000 })
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Trop de requêtes. Réessayez dans quelques minutes.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+    )
   }
+
+  const supabase = await createClient()
+  const body = await req.json()
+  const { property_id, check_in, check_out, guest_name, guest_email, guest_phone, guests, airbnb_profile_url, notes } = body
+
+  // Validation serveur
+  if (!property_id || !check_in || !check_out || !guest_name || !guest_email) {
+    return NextResponse.json({ error: 'Champs obligatoires manquants' }, { status: 400 })
+  }
+  if (new Date(check_in) >= new Date(check_out)) {
+    return NextResponse.json({ error: 'Dates invalides' }, { status: 400 })
+  }
+  if (guest_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest_email)) {
+    return NextResponse.json({ error: 'Email invalide' }, { status: 400 })
+  }
+
+  // Vérifier les conflits avec les réservations confirmées
+  const { data: conflicts } = await supabase
+    .from('bookings')
+    .select('id')
+    .eq('property_id', property_id)
+    .in('status', ['confirmed', 'pending'])
+    .or(`and(check_in.lt.${check_out},check_out.gt.${check_in})`)
+
+  if (conflicts && conflicts.length > 0) {
+    return NextResponse.json({ error: 'Ces dates sont déjà réservées' }, { status: 409 })
+  }
+
+  // Calculer le prix
+  const { data: property } = await supabase.from('properties').select('base_price, tenant_id').eq('id', property_id).single()
+  if (!property) return NextResponse.json({ error: 'Logement introuvable' }, { status: 404 })
+
+  const nights = Math.round((new Date(check_out).getTime() - new Date(check_in).getTime()) / 86400000)
+  let total_price = property.base_price * nights
+
+  // Appliquer les règles de prix
+  try {
+    const pricingRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/pricing?property_id=${property_id}&check_in=${check_in}&check_out=${check_out}`)
+    if (pricingRes.ok) {
+      const breakdown = await pricingRes.json()
+      if (breakdown.finalPrice) total_price = breakdown.finalPrice
+    }
+  } catch {}
+
+  const { data, error } = await supabase.from('bookings').insert({
+    property_id,
+    tenant_id: property.tenant_id,
+    check_in, check_out,
+    guest_name: guest_name.trim().slice(0, 100),
+    guest_email: guest_email.trim().toLowerCase().slice(0, 200),
+    guest_phone: guest_phone?.trim().slice(0, 20),
+    guests: guests || 1,
+    airbnb_profile_url: airbnb_profile_url?.trim().slice(0, 500),
+    notes: notes?.trim().slice(0, 1000),
+    status: 'pending',
+    total_price,
+  }).select().single()
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data, { status: 201 })
 }
