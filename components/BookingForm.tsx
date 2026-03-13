@@ -104,8 +104,8 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
           property_id: propertyId,
           guest_name: guestName,
           guest_email: guestEmail,
-          check_in: range.from.toISOString().split('T')[0],
-          check_out: range.to.toISOString().split('T')[0],
+          check_in: range.from.toLocaleDateString('sv-SE'),
+          check_out: range.to.toLocaleDateString('sv-SE'),
           guests,
         }),
       })
