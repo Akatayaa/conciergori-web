@@ -1,49 +1,97 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')
   if (!token) return NextResponse.json({ error: 'token required' }, { status: 400 })
 
-  // Valider le token
-  const { data: owner, error } = await supabase
-    .from('owners').select('*, properties(id, name, cover_image, base_price, owner_commission)').eq('portal_token', token).single()
-  if (error || !owner) return NextResponse.json({ error: 'Token invalide' }, { status: 401 })
+  // Trouver l'owner par token
+  const { data: owner, error: ownerErr } = await supabase
+    .from('owners')
+    .select('id, name, owner_commission, tenant_id')
+    .eq('portal_token', token)
+    .single()
 
-  // Stats par propriété
-  const propertyIds = owner.properties?.map((p: { id: string }) => p.id) ?? []
-  const now = new Date()
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+  if (ownerErr || !owner) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
+  // Logements du propriétaire
+  const { data: ownerProps } = await supabase
+    .from('owner_properties')
+    .select('property_id')
+    .eq('owner_id', owner.id)
+
+  const propertyIds = (ownerProps || []).map(op => op.property_id)
+
+  if (propertyIds.length === 0) {
+    return NextResponse.json({ owner: { name: owner.name }, properties: [] })
+  }
+
+  const { data: properties } = await supabase
+    .from('properties')
+    .select('id, name, cover_image')
+    .in('id', propertyIds)
+
+  // Réservations confirmées par logement
   const { data: bookings } = await supabase
     .from('bookings')
-    .select('property_id, check_in, check_out, total_price, status, guest_name')
+    .select('id, property_id, check_in, check_out, status, total_price')
     .in('property_id', propertyIds)
     .eq('status', 'confirmed')
-    .order('check_in', { ascending: false })
+    .order('check_in', { ascending: true })
 
-  // Calculer revenus propriétaire (total_price × owner_commission / 100)
-  const stats = owner.properties?.map((prop: { id: string; name: string; owner_commission: number; cover_image: string; base_price: number }) => {
-    const propBookings = bookings?.filter(b => b.property_id === prop.id) ?? []
-    const monthBookings = propBookings.filter(b => b.check_in >= startOfMonth)
-    const totalRevenue = propBookings.reduce((s: number, b: { total_price: number | null }) => s + (b.total_price ?? 0), 0)
-    const monthRevenue = monthBookings.reduce((s: number, b: { total_price: number | null }) => s + (b.total_price ?? 0), 0)
-    const ownerRate = (prop.owner_commission ?? 80) / 100
-    const upcomingBookings = propBookings.filter(b => b.check_in >= now.toISOString().split('T')[0]).slice(0, 3)
+  const now = new Date()
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+
+  const propertiesWithStats = (properties || []).map(prop => {
+    const propBookings = (bookings || []).filter(b => b.property_id === prop.id)
+    const confirmed    = propBookings // already filtered to confirmed
+
+    // CA total
+    const totalRevenue = confirmed.reduce((sum, b) => sum + (b.total_price || 0), 0)
+    const ownerTotal   = Math.round(totalRevenue * (owner.owner_commission / 100) * 100) / 100
+
+    // CA ce mois
+    const thisMonthBookings = confirmed.filter(b => b.check_in >= startOfMonth)
+    const monthRevenue = thisMonthBookings.reduce((sum, b) => sum + (b.total_price || 0), 0)
+    const ownerMonth   = Math.round(monthRevenue * (owner.owner_commission / 100) * 100) / 100
+
+    // Nuits confirmées
+    const totalNights = confirmed.reduce((sum, b) => {
+      const nights = Math.round(
+        (new Date(b.check_out).getTime() - new Date(b.check_in).getTime()) / 86400000
+      )
+      return sum + nights
+    }, 0)
+
+    // Prochaines réservations (3 max, sans nom voyageur)
+    const upcoming = confirmed
+      .filter(b => new Date(b.check_out) >= now)
+      .slice(0, 3)
+      .map(b => ({
+        check_in: b.check_in,
+        check_out: b.check_out,
+        status: b.status,
+        nights: Math.round(
+          (new Date(b.check_out).getTime() - new Date(b.check_in).getTime()) / 86400000
+        ),
+      }))
 
     return {
-      property: prop,
-      totalNights: propBookings.reduce((s: number, b: { check_in: string; check_out: string }) => {
-        return s + Math.round((new Date(b.check_out).getTime() - new Date(b.check_in).getTime()) / 86400000)
-      }, 0),
-      monthRevenue: Math.round(monthRevenue * ownerRate),
-      totalRevenue: Math.round(totalRevenue * ownerRate),
-      bookingsCount: propBookings.length,
-      upcomingBookings,
+      id: prop.id,
+      name: prop.name,
+      cover_image: prop.cover_image,
+      stats: { ownerMonth, ownerTotal, totalNights },
+      upcoming,
     }
   })
 
-  return NextResponse.json({ owner: { name: owner.name, email: owner.email }, stats })
+  return NextResponse.json({
+    owner: { name: owner.name, owner_commission: owner.owner_commission },
+    properties: propertiesWithStats,
+  })
 }
