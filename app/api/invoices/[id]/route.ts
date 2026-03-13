@@ -1,24 +1,29 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
-  const { data, error } = await supabase.from('invoices').select('*').eq('id', (await params).id).single()
+  const { id } = await params
+  const { data, error } = await supabase.from('invoices').select('*').eq('id', id).single()
   if (error) return NextResponse.json({ error: error.message }, { status: 404 })
   return NextResponse.json(data)
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
+  const { id } = await params
   const body = await req.json()
-  const { data, error } = await supabase.from('invoices').update(body).eq('id', (await params).id).select().single()
+  const { data, error } = await supabase.from('invoices').update(body).eq('id', id).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const supabase = await createClient()
-  const { error } = await supabase.from('invoices').delete().eq('id', (await params).id)
+  const { id } = await params
+  const { error } = await supabase.from('invoices').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return new NextResponse(null, { status: 204 })
 }

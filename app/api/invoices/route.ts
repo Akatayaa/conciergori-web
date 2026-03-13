@@ -1,8 +1,13 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Service role pour bypasser RLS sur les routes API
+const supabase = createSupabaseClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
 export async function GET(req: NextRequest) {
-  const supabase = await createClient()
   const { searchParams } = new URL(req.url)
   const tenantId = searchParams.get('tenant_id')
   if (!tenantId) return NextResponse.json({ error: 'tenant_id required' }, { status: 400 })
@@ -18,7 +23,6 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
   const body = await req.json()
   const { tenant_id, booking_id, additional_fees = [] } = body
 
@@ -26,7 +30,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'tenant_id and booking_id required' }, { status: 400 })
   }
 
-  // Récupérer la réservation
   const { data: booking, error: bErr } = await supabase
     .from('bookings')
     .select('*, properties(name)')
@@ -34,7 +37,6 @@ export async function POST(req: NextRequest) {
     .single()
   if (bErr || !booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
-  // Récupérer les settings de facturation
   const { data: settings } = await supabase
     .from('invoice_settings')
     .select('*')
@@ -44,17 +46,15 @@ export async function POST(req: NextRequest) {
   const concierge_rate = settings?.concierge_rate ?? 20
   const invoice_prefix = settings?.invoice_prefix ?? 'FAC'
 
-  // Calcul
   const checkIn = new Date(booking.check_in)
   const checkOut = new Date(booking.check_out)
   const nights = Math.round((checkOut.getTime() - checkIn.getTime()) / 86400000)
-  const nightly_total = booking.total_price ?? booking.base_price * nights
+  const nightly_total = booking.total_price ?? (booking.base_price * nights)
   const concierge_fee = Math.round((nightly_total * concierge_rate) / 100 * 100) / 100
   const fees_total = additional_fees.reduce((sum: number, f: { amount: number; enabled?: boolean }) =>
     f.enabled !== false ? sum + (f.amount || 0) : sum, 0)
   const total = concierge_fee + fees_total
 
-  // Numéro de facture auto-incrémenté
   const { data: settingsRow } = await supabase
     .from('invoice_settings')
     .select('next_invoice_number')
@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
   const num = settingsRow?.next_invoice_number ?? 1
   const invoice_number = `${invoice_prefix}-${String(num).padStart(4, '0')}`
 
-  // Incrémenter le compteur
   await supabase
     .from('invoice_settings')
     .update({ next_invoice_number: num + 1 })
