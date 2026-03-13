@@ -15,6 +15,7 @@ const NAV = [
   { href: 'dashboard/logements',     label: '🛏 Logements' },
   { href: 'dashboard/reservations',  label: '📅 Réservations' },
   { href: 'dashboard/calendrier',    label: '📆 Calendrier' },
+  { href: 'dashboard/facturation',   label: '🧾 Facturation' },
   { href: 'dashboard/pricing',       label: '💰 Prix & règles' },
 ]
 

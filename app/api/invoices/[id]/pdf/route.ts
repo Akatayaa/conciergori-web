@@ -269,14 +269,14 @@ function generateHTML(invoice: Invoice, settings: InvoiceSettings | null): strin
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = await createClient()
 
   const { data: invoice, error } = await supabase
     .from('invoices')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', (await params).id)
     .single()
 
   if (error || !invoice) {
