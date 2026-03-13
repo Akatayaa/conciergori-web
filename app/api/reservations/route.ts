@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+const supabase = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
@@ -13,7 +14,6 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const supabase = await createClient()
   const body = await req.json()
   const { property_id, check_in, check_out, guest_name, guest_email, guest_phone, guests, airbnb_profile_url, notes } = body
 
