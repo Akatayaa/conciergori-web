@@ -17,7 +17,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50" style={{ backgroundColor: '#fff2e0', borderBottom: '1px solid #e8d8c0' }}>
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" onClick={() => setOpen(false)}>
+        <a href="/" onClick={() => setOpen(false)}>
           <img src="/logo.svg" alt="Concierg'ori" className="h-14 w-auto" />
         </a>
 
