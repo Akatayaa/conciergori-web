@@ -86,11 +86,16 @@ nav {
   border-bottom: 1px solid transparent;
 }
 nav.scrolled {
-  background: rgba(255,242,224,0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #e8d8c0;
+  background: rgba(0,36,63,0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
+nav.scrolled .nav-center a { color: rgba(255,255,255,0.8); }
+nav.scrolled .nav-center a:hover { color: #fff; }
+nav.scrolled .nav-logo-text { color: #fff !important; }
+nav.scrolled .nav-logo-text span { color: var(--teal) !important; }
+nav.scrolled .nav-cta { background: var(--teal); }
 .nav-logo {
   flex: 0 0 auto;
   animation-delay: 0s;
@@ -593,7 +598,7 @@ footer {
 <!-- ══ NAVBAR ══ -->
 <nav>
   <div class="nav-logo anim-nav">
-    <div style="font-family: 'Alkatra', cursive; font-size: 28px; color: white; font-weight: 700;">Concierg<span style="color: #0097b2;">'ori</span></div>
+    <div class="nav-logo-text" style="font-family: 'Alkatra', cursive; font-size: 28px; color: var(--navy); font-weight: 700; transition: color 0.3s;">Concierg<span style="color: #0097b2;">'ori</span></div>
   </div>
   <div class="nav-center">
     <a href="#logements" class="anim-nav nav-l1">Logements</a>
