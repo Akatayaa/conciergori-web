@@ -310,8 +310,8 @@ nav {
    SERVICES — CARROUSEL PHOTO
 ══════════════════════════════ */
 #services {
-  padding: 100px 0;
-  background: var(--navy);
+  padding: 0 0 80px;
+  background: var(--cream);
   overflow: hidden;
 }
 .services-track-wrap {
@@ -327,7 +327,7 @@ nav {
   padding-bottom: 4px;
 }
 .svc-card {
-  flex: 0 0 280px; height: 360px;
+  flex: 0 0 280px; height: 420px;
   border-radius: 20px; overflow: hidden;
   position: relative; cursor: pointer;
   transition: transform 0.3s ease;
@@ -717,11 +717,11 @@ footer {
 
 <!-- ══ SERVICES ══ -->
 <section id="services">
-  <div class="container" style="margin-bottom:48px;">
+  <div class="container" style="margin-bottom:40px; padding-top:60px;">
     <div class="reveal">
-      <p class="sec-label" style="color:var(--teal-lt)">Nos prestations</p>
-      <h2 class="sec-title" style="color:#fff">Une conciergerie complète,<br>de A à Z</h2>
-      <p class="sec-sub" style="color:rgba(255,255,255,0.55)">De l'accueil à la maintenance, on gère tout pour que vos voyageurs repartent ravis.</p>
+      <p class="sec-label">Nos prestations</p>
+      <h2 class="sec-title">Une conciergerie complète,<br>de A à Z</h2>
+      <p class="sec-sub">De l'accueil à la maintenance, on gère tout pour que vos voyageurs repartent ravis.</p>
     </div>
   </div>
 
@@ -1065,27 +1065,27 @@ const co = new IntersectionObserver((entries) => {
 }, { threshold: 0.5 });
 countEls.forEach(el => co.observe(el));
 
-// ── Testimonials drag scroll
-const temoWrap = document.getElementById('temoTrack')?.parentElement;
-const temoTrack = document.getElementById('temoTrack');
-if (temoWrap && temoTrack) {
-  let isDown = false, startX, scrollLeft;
-  temoWrap.addEventListener('mousedown', e => { isDown = true; temoWrap.style.cursor = 'grabbing'; startX = e.pageX - temoWrap.offsetLeft; scrollLeft = temoWrap.scrollLeft; });
-  temoWrap.addEventListener('mouseleave', () => { isDown = false; temoWrap.style.cursor = 'grab'; });
-  temoWrap.addEventListener('mouseup', () => { isDown = false; temoWrap.style.cursor = 'grab'; });
-  temoWrap.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const x = e.pageX - temoWrap.offsetLeft; temoWrap.scrollLeft = scrollLeft - (x - startX); });
-}
+// ── drag scroll handled by makeDraggable() below
 
-// ── Services drag scroll
-const track = document.getElementById('svcTrack');
-const wrap = track?.parentElement;
-if (wrap && track) {
+// ── Drag scroll helper (applies to any .drag-scroll wrapper)
+function makeDraggable(wrap) {
+  if (!wrap) return;
   let isDown = false, startX, scrollLeft;
-  wrap.addEventListener('mousedown', e => { isDown = true; wrap.style.cursor = 'grabbing'; startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft; });
-  wrap.addEventListener('mouseleave', () => { isDown = false; wrap.style.cursor = 'grab'; });
-  wrap.addEventListener('mouseup', () => { isDown = false; wrap.style.cursor = 'grab'; });
-  wrap.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const x = e.pageX - wrap.offsetLeft; wrap.scrollLeft = scrollLeft - (x - startX); });
+  wrap.addEventListener('mousedown', e => {
+    isDown = true; startX = e.pageX - wrap.offsetLeft; scrollLeft = wrap.scrollLeft;
+    wrap.style.cursor = 'grabbing'; wrap.style.userSelect = 'none';
+  });
+  const stop = () => { isDown = false; wrap.style.cursor = 'grab'; wrap.style.userSelect = ''; };
+  wrap.addEventListener('mouseleave', stop);
+  wrap.addEventListener('mouseup', stop);
+  wrap.addEventListener('mousemove', e => {
+    if (!isDown) return;
+    e.preventDefault();
+    wrap.scrollLeft = scrollLeft - (e.pageX - wrap.offsetLeft - startX);
+  });
 }
+makeDraggable(document.getElementById('svcTrack')?.parentElement);
+makeDraggable(document.getElementById('temoTrack')?.parentElement);
 </script>
 
 </body>
