@@ -531,14 +531,15 @@ nav.scrolled .nav-cta { background: var(--teal); }
   padding: 80px 80px;
   position: relative;
   overflow: hidden;
-  max-width: min(900px, 90vw);
+  max-width: min(1100px, 95vw);
   margin: 0 auto;
   text-align: center;
 }
-.cta-card::before, .cta-card::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
-.cta-card::before { width: 300px; height: 300px; top: -100px; right: -60px; background: radial-gradient(circle, rgba(0,151,178,0.12) 0%, transparent 70%); }
-.cta-card::after  { width: 200px; height: 200px; bottom: -60px; left: -40px; background: radial-gradient(circle, rgba(115,199,214,0.10) 0%, transparent 70%); }
-.cta-deco-3 { position: absolute; width: 150px; height: 150px; border-radius: 50%; top: 50%; right: 30%; transform: translateY(-50%); background: radial-gradient(circle, rgba(0,151,178,0.08) 0%, transparent 70%); pointer-events: none; }
+.cta-card::before, .cta-card::after { content: none; }
+.cta-circle { position: absolute; border-radius: 50%; background: #fff; opacity: 0.08; pointer-events: none; }
+.cta-circle-1 { width: 320px; height: 320px; top: -100px; right: -80px; }
+.cta-circle-2 { width: 200px; height: 200px; bottom: -70px; left: -50px; }
+.cta-circle-3 { width: 140px; height: 140px; top: 50%; right: 28%; transform: translateY(-50%); }
 .cta-label { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 16px; }
 .cta-title { font-family: var(--font-h); font-size: clamp(30px,4vw,52px); color: #fff; line-height: 1.15; margin-bottom: 18px; }
 .cta-sub { font-size: 17px; color: rgba(255,255,255,0.55); max-width: 500px; margin: 0 auto 44px; line-height: 1.6; }
@@ -1046,7 +1047,9 @@ footer {
 <section id="cta-final">
   <div class="container">
     <div class="cta-card reveal">
-      <div class="cta-deco-3"></div>
+      <div class="cta-circle cta-circle-1"></div>
+      <div class="cta-circle cta-circle-2"></div>
+      <div class="cta-circle cta-circle-3"></div>
       <p class="cta-label">Réservation directe</p>
       <h2 class="cta-title">Réservez en direct,<br>économisez jusqu'à 15%</h2>
       <p class="cta-sub">Contactez notre équipe pour connaître les disponibilités et obtenir le meilleur tarif — sans frais de plateforme.</p>
