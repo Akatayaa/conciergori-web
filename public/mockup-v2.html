@@ -338,17 +338,11 @@ nav.scrolled .nav-cta { background: var(--teal); }
   background: #fafafa;
   overflow: hidden;
 }
-.services-track-wrap {
-  overflow-x: auto;
-  padding: 0 48px 24px;
-  scrollbar-width: none;
-  cursor: grab;
-}
-.services-track-wrap::-webkit-scrollbar { display: none; }
-.services-track {
-  display: flex; gap: 20px;
-  width: max-content;
-  padding-bottom: 4px;
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 0 48px;
 }
 .svc-card {
   flex: 0 0 280px; height: 500px;
@@ -356,7 +350,7 @@ nav.scrolled .nav-cta { background: var(--teal); }
   position: relative; cursor: pointer;
   transition: transform 0.3s ease;
 }
-.svc-card:hover { transform: scale(1.03); }
+.svc-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,36,63,0.18); }
 .svc-bg {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
@@ -809,8 +803,7 @@ footer {
     </div>
   </div>
 
-  <div class="services-track-wrap">
-    <div class="services-track" id="svcTrack">
+  <div class="services-grid">
 
       <div class="svc-card reveal">
         <div class="svc-bg" style="background:linear-gradient(135deg,#004a6e,#0097b2);">🔑</div>
@@ -1221,7 +1214,7 @@ function makeDraggable(wrap) {
     wrap.scrollLeft = scrollLeft - (e.pageX - wrap.offsetLeft - startX);
   });
 }
-makeDraggable(document.getElementById('svcTrack')?.parentElement);
+// services is now a static grid — no drag needed
 makeDraggable(document.getElementById('temoTrack')?.parentElement);
 </script>
 
