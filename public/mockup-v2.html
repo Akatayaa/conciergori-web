@@ -77,11 +77,19 @@ body { font-family: var(--font-b); background: var(--cream); color: var(--text);
 ══════════════════════════════ */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  background: var(--navy);
+  background: transparent;
   height: 68px;
   display: flex; align-items: center;
   padding: 0 48px;
   gap: 0;
+  transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+nav.scrolled {
+  background: rgba(255,242,224,0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e8d8c0;
 }
 .nav-logo {
   flex: 0 0 auto;
@@ -95,11 +103,11 @@ nav {
 }
 .nav-center a {
   font-size: 14px; font-weight: 600;
-  color: rgba(255,255,255,0.75);
+  color: var(--navy);
   text-decoration: none;
   transition: color 0.2s;
 }
-.nav-center a:hover { color: #fff; }
+.nav-center a:hover { color: var(--teal); }
 
 .nav-right { flex: 0 0 auto; }
 .nav-cta {
@@ -1049,6 +1057,17 @@ footer {
 
 <!-- ══ JS ══ -->
 <script>
+// ── Navbar scroll behaviour
+(function() {
+  const nav = document.querySelector('nav');
+  function onScroll() {
+    if (window.scrollY > 50) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll(); // init state
+})();
+
 // ── Scroll reveal
 // Éléments commencent tous à opacity:0. Après 300ms, l'observer déclenche
 // l'animation — y compris pour ceux déjà dans le viewport au chargement.
