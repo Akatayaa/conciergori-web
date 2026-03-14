@@ -268,9 +268,9 @@ nav {
   background-size: 256px;
 }
 .container { max-width: 1140px; margin: 0 auto; padding: 0 48px; position: relative; z-index: 1; }
-.sec-label { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; }
-.sec-title { font-family: var(--font-h); font-size: clamp(28px,3.5vw,46px); color: var(--navy); line-height: 1.15; margin-bottom: 14px; }
-.sec-sub { font-size: 17px; color: var(--muted); max-width: 500px; line-height: 1.6; }
+.sec-label { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; text-align: center; }
+.sec-title { font-family: var(--font-h); font-size: clamp(28px,3.5vw,46px); color: var(--navy); line-height: 1.15; margin-bottom: 14px; text-align: center; }
+.sec-sub { font-size: 17px; color: #5a5a5a; max-width: 500px; line-height: 1.6; text-align: center; margin-left: auto; margin-right: auto; }
 
 .cards-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 52px; }
 
@@ -355,14 +355,14 @@ nav {
    PROPRIÉTAIRES SECTION
 ══════════════════════════════ */
 #proprio {
-  background: var(--navy);
+  background: var(--cream);
   padding: 100px 0;
   position: relative; overflow: hidden;
 }
 #proprio::before {
   content: ''; position: absolute; top: -60px; right: -80px; z-index: 0;
   width: 350px; height: 350px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(115,199,214,0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0,151,178,0.07) 0%, transparent 70%);
   pointer-events: none;
 }
 #proprio::after {
@@ -372,27 +372,27 @@ nav {
   pointer-events: none;
 }
 .proprio-inner { position: relative; z-index: 1; }
-.proprio-header { margin-bottom: 56px; }
-.proprio-title { font-family: var(--font-h); font-size: clamp(28px,3.5vw,48px); color: #fff; line-height: 1.15; margin-bottom: 16px; }
-.proprio-sub { font-size: 18px; color: rgba(255,255,255,0.65); max-width: 540px; line-height: 1.65; }
+.proprio-header { margin-bottom: 56px; text-align: center; }
+.proprio-title { font-family: var(--font-h); font-size: clamp(28px,3.5vw,48px); color: var(--navy); line-height: 1.15; margin-bottom: 16px; text-align: center; }
+.proprio-sub { font-size: 18px; color: #5a5a5a; max-width: 540px; line-height: 1.65; text-align: center; margin: 0 auto; }
 .proprio-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; margin-bottom: 52px; position: relative; }
 .proprio-steps::before {
   content: ''; position: absolute;
   top: 36px; left: calc(16.666% + 20px); right: calc(16.666% + 20px);
-  height: 1px; background: rgba(115,199,214,0.25);
+  height: 1px; background: rgba(0,151,178,0.2);
 }
 .pstep { text-align: center; }
 .pstep-num {
   width: 72px; height: 72px; border-radius: 50%;
-  border: 2px solid rgba(115,199,214,0.5);
+  border: 2px solid var(--teal);
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto 20px;
   font-size: 26px;
-  background: rgba(115,199,214,0.06);
-  position: relative; background-color: var(--navy);
+  background: rgba(0,151,178,0.06);
+  position: relative; background-color: var(--cream);
 }
-.pstep-title { font-family: var(--font-sub); font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 10px; }
-.pstep-desc { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.6; }
+.pstep-title { font-family: var(--font-sub); font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.pstep-desc { font-size: 14px; color: #5a5a5a; line-height: 1.6; }
 .btn-white {
   background: #fff; color: var(--navy);
   padding: 15px 32px; border-radius: 50px;
@@ -801,7 +801,7 @@ footer {
     <div class="proprio-inner">
 
       <div class="proprio-header reveal">
-        <p class="sec-label" style="color:var(--teal-lt)">Pour les propriétaires</p>
+        <p class="sec-label" style="text-align:center">Pour les propriétaires</p>
         <h2 class="proprio-title">Vous avez un logement<br>à Caen ?</h2>
         <p class="proprio-sub">Confiez-nous sa gestion. Vous encaissez, on s'occupe du reste — accueil, ménage, maintenance, tout.</p>
       </div>
@@ -824,8 +824,8 @@ footer {
         </div>
       </div>
 
-      <div class="reveal">
-        <a href="mailto:contact@conciergori.fr" class="btn-white">
+      <div class="reveal" style="text-align:center;">
+        <a href="mailto:contact@conciergori.fr" class="btn-primary">
           Devenir partenaire
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
