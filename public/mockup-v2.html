@@ -66,7 +66,7 @@ body { font-family: var(--font-b); background: var(--cream); color: var(--text);
 ══════════════════════════════ */
 nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  background: var(--dark);
+  background: var(--navy);
   height: 68px;
   display: flex; align-items: center;
   padding: 0 48px;
@@ -595,6 +595,14 @@ footer {
       14 logements d'exception gérés avec soin. Réservez en direct et économisez sur les frais de plateforme — service humain, réponse rapide.
     </p>
 
+    <!-- Badge -20% sous le sous-titre -->
+    <div class="anim-hero" style="animation-delay:0.30s; margin-bottom:28px;">
+      <span style="display:inline-flex; align-items:center; gap:8px; background:#e6f7fa; color:#0097b2; padding:8px 16px; border-radius:50px; font-size:13px; font-weight:700;">
+        <svg width="14" height="14" fill="none" stroke="#0097b2" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        -20% vs Airbnb en réservant en direct
+      </span>
+    </div>
+
     <div class="hero-ctas anim-hero" style="animation-delay:0.35s">
       <a href="#logements" class="btn-primary">
         Voir les logements
@@ -626,11 +634,13 @@ footer {
       <div class="hero-overlay-l"></div>
 
       <!-- Widget flottant bottom-right -->
-      <div class="hero-widget">
-        <div class="widget-lbl">Prochain logement dispo</div>
-        <div class="widget-val">Appartement Hypercentre</div>
-        <span class="widget-tag">✓ Libre ce week-end</span>
-      </div>
+      <a href="/logements" style="text-decoration:none; display:block; cursor:pointer;">
+        <div class="hero-widget" style="cursor:pointer; transition:transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 20px 56px rgba(0,36,63,0.22)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+          <div class="widget-lbl">Prochain logement dispo</div>
+          <div class="widget-val">Appartement Hypercentre</div>
+          <span class="widget-tag">✓ Libre ce week-end</span>
+        </div>
+      </a>
     </div>
   </div>
 </section>
