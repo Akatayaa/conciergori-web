@@ -442,25 +442,27 @@ nav {
   position: relative; z-index: 1;
 }
 .temo-card {
-  background: #fff; border-radius: 20px; padding: 28px 26px;
-  border: 1px solid rgba(0,151,178,0.12);
+  background: #ffffff; border-radius: 20px; padding: 28px 26px;
+  border: 1px solid #d9cfc4;
   position: relative; overflow: hidden;
   transition: transform 0.25s, box-shadow 0.25s;
+  display: flex; flex-direction: column;
 }
-.temo-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,36,63,0.09); }
+.temo-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,36,63,0.10); }
 .temo-card::before {
   content: '❝';
-  position: absolute; top: -16px; right: 20px;
-  font-size: 110px; color: var(--teal-lt); opacity: 0.12;
-  font-family: Georgia, serif; line-height: 1; pointer-events: none;
+  position: absolute; top: -10px; right: 18px;
+  font-size: 120px; color: var(--teal); opacity: 0.09;
+  font-family: Georgia, serif; line-height: 1; pointer-events: none; z-index: 0;
 }
 .temo-stars { color: var(--teal); font-size: 15px; margin-bottom: 12px; }
 .temo-text {
   font-size: 14px; line-height: 1.7; color: var(--text);
-  font-style: italic; margin-bottom: 20px;
+  font-style: italic; margin-bottom: 0;
   position: relative; z-index: 1;
+  flex: 1;
 }
-.temo-author { display: flex; align-items: center; gap: 10px; padding-top: 16px; border-top: 1px solid rgba(0,151,178,0.1); }
+.temo-author { display: flex; align-items: center; gap: 10px; padding-top: 16px; border-top: 1px solid rgba(0,151,178,0.1); margin-top: auto; }
 .temo-av {
   width: 38px; height: 38px; border-radius: 50%;
   background: var(--teal); color: #fff;
@@ -487,6 +489,7 @@ nav {
 }
 .temo-track .temo-card {
   flex: 0 0 300px;
+  height: 260px;
 }
 
 /* ══════════════════════════════
@@ -1064,6 +1067,43 @@ const co = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.5 });
 countEls.forEach(el => co.observe(el));
+
+// ── Testimonials auto-scroll (loop infini, pause au hover)
+(function() {
+  const wrap = document.getElementById('temoTrack')?.parentElement;
+  if (!wrap) return;
+  const track = document.getElementById('temoTrack');
+  let paused = false;
+  let animId;
+
+  // Clone cards pour loop infini
+  function setupLoop() {
+    const cards = Array.from(track.children);
+    cards.forEach(card => {
+      const clone = card.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+  }
+  setupLoop();
+
+  const SPEED = 0.6; // px per frame (~3s par card de 300px)
+  function autoScroll() {
+    if (!paused) {
+      wrap.scrollLeft += SPEED;
+      // Reset au milieu du track (loop seamless)
+      const half = track.scrollWidth / 2;
+      if (wrap.scrollLeft >= half) wrap.scrollLeft -= half;
+    }
+    animId = requestAnimationFrame(autoScroll);
+  }
+  autoScroll();
+
+  wrap.addEventListener('mouseenter', () => { paused = true; });
+  wrap.addEventListener('mouseleave', () => { paused = false; });
+  wrap.addEventListener('touchstart', () => { paused = true; }, { passive: true });
+  wrap.addEventListener('touchend', () => { setTimeout(() => paused = false, 2000); }, { passive: true });
+})();
 
 // ── drag scroll handled by makeDraggable() below
 
