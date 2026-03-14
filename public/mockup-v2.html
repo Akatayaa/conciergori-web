@@ -496,24 +496,25 @@ nav {
    CTA FINAL
 ══════════════════════════════ */
 #cta-final {
-  background: var(--dark);
+  background: var(--cream);
   padding: 100px 0;
   position: relative; overflow: hidden;
 }
-.cta-blob-1 {
-  position: absolute; top: -80px; left: -60px; z-index: 0;
-  width: 400px; height: 400px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,151,178,0.08) 0%, transparent 70%);
+/* cta blobs moved inside card */
+.cta-card {
+  background: var(--navy);
+  border-radius: 28px;
+  padding: 80px 80px;
+  position: relative;
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
 }
-.cta-blob-2 {
-  position: absolute; bottom: -60px; right: -40px; z-index: 0;
-  width: 300px; height: 300px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(115,199,214,0.06) 0%, transparent 70%);
-}
-.cta-inner {
-  position: relative; z-index: 1;
-  text-align: center; max-width: 700px; margin: 0 auto;
-}
+.cta-card::before, .cta-card::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
+.cta-card::before { width: 300px; height: 300px; top: -100px; right: -60px; background: radial-gradient(circle, rgba(0,151,178,0.12) 0%, transparent 70%); }
+.cta-card::after  { width: 200px; height: 200px; bottom: -60px; left: -40px; background: radial-gradient(circle, rgba(115,199,214,0.10) 0%, transparent 70%); }
+.cta-deco-3 { position: absolute; width: 150px; height: 150px; border-radius: 50%; top: 50%; right: 30%; transform: translateY(-50%); background: radial-gradient(circle, rgba(0,151,178,0.08) 0%, transparent 70%); pointer-events: none; }
 .cta-label { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 16px; }
 .cta-title { font-family: var(--font-h); font-size: clamp(30px,4vw,52px); color: #fff; line-height: 1.15; margin-bottom: 18px; }
 .cta-sub { font-size: 17px; color: rgba(255,255,255,0.55); max-width: 500px; margin: 0 auto 44px; line-height: 1.6; }
@@ -567,7 +568,7 @@ footer {
 <!-- ══ NAVBAR ══ -->
 <nav>
   <div class="nav-logo anim-nav">
-    <img src="/home/matthis/projects/conciergori-web/public/logo.svg" alt="Concierg'ori" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+    <img src="https://conciergori.fr/logo.svg" alt="Concierg'ori" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
     <span style="display:none; font-family:var(--font-sub); font-size:22px; color:#fff;">Concierg<span style="color:var(--teal)">'ori</span></span>
   </div>
   <div class="nav-center">
@@ -973,10 +974,9 @@ footer {
 
 <!-- ══ CTA FINAL ══ -->
 <section id="cta-final">
-  <div class="cta-blob-1"></div>
-  <div class="cta-blob-2"></div>
   <div class="container">
-    <div class="cta-inner reveal">
+    <div class="cta-card reveal">
+      <div class="cta-deco-3"></div>
       <p class="cta-label">Réservation directe</p>
       <h2 class="cta-title">Réservez en direct,<br>économisez jusqu'à 15%</h2>
       <p class="cta-sub">Contactez notre équipe pour connaître les disponibilités et obtenir le meilleur tarif — sans frais de plateforme.</p>
@@ -987,7 +987,7 @@ footer {
         </a>
         <a href="mailto:contact@conciergori.fr" class="btn-outline-white">Confier mon bien</a>
       </div>
-      <p style="margin-top:28px; font-size:13px; color:rgba(255,255,255,0.28);">📍 Caen, Normandie</p>
+      <p style="margin-top:32px; font-size:13px; color:rgba(255,255,255,0.40);">📍 Caen, Normandie</p>
     </div>
   </div>
 </section>
@@ -998,7 +998,7 @@ footer {
 
     <!-- Col 1 : Brand -->
     <div>
-      <img src="/home/matthis/projects/conciergori-web/public/logo.svg" alt="Concierg'ori" class="footer-logo-img" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span style=\'font-family:var(--font-sub);font-size:22px;color:#fff;display:block;margin-bottom:14px;\'>Concierg<span style=\'color:var(--teal)\'>&apos;ori</span></span>')">
+      <img src="https://conciergori.fr/logo.svg" alt="Concierg'ori" class="footer-logo-img" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span style=\'font-family:var(--font-sub);font-size:22px;color:#fff;display:block;margin-bottom:14px;\'>Concierg<span style=\'color:var(--teal)\'>&apos;ori</span></span>')">
       <p class="footer-tagline">Conciergerie à Caen depuis 2016.<br>Votre bien géré avec soin.</p>
     </div>
 
