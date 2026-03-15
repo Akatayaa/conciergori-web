@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { DayPicker, DateRange } from 'react-day-picker'
 import { fr } from 'react-day-picker/locale'
@@ -25,6 +26,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
     appliedRules: { name: string; effect: string; delta: number }[];
     totalDiscount: number; totalMarkup: number;
   } | null>(null)
+  const router = useRouter()
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [blockedDates, setBlockedDates] = useState<Date[]>([])
@@ -111,7 +113,7 @@ export default function BookingForm({ propertyId, maxGuests, basePrice }: Bookin
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erreur')
-      setStatus('success')
+      router.push('/reservation/confirmation')
     } catch (err: any) {
       setStatus('error')
       setErrorMsg(err.message)

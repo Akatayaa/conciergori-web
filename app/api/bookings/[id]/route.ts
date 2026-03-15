@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendBookingStatusEmail } from '@/lib/send-booking-status'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,6 +36,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         scheduled_date: booking.check_out, // ménage le jour du départ
       })
     }
+  }
+
+  // Email automatique au voyageur
+  if ((body.status === 'confirmed' || body.status === 'cancelled') && booking) {
+    sendBookingStatusEmail(id, body.status).catch(console.error)
   }
 
   return NextResponse.json({ success: true })

@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import PropertyRow from '@/components/dashboard/PropertyRow'
 import PropertyKpis from '@/components/dashboard/PropertyKpis'
+import Link from 'next/link'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -68,6 +69,11 @@ export default async function LogementsPage({ params }: { params: Promise<{ tena
             {properties?.length ?? 0} logement{(properties?.length ?? 0) > 1 ? 's' : ''} — stats de{' '}
             {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
           </p>
+          <Link href="./logements/nouveau"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: '#0097b2' }}>
+            + Nouveau logement
+          </Link>
         </div>
 
         <div className="space-y-4">
