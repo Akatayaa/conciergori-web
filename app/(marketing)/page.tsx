@@ -1,9 +1,14 @@
 import Navbar from '@/components/Navbar'
+import ScrollReveal from '@/components/ScrollReveal'
+import CountUp from '@/components/CountUp'
+import TestimonialsCarousel from '@/components/sections/TestimonialsCarousel'
+import Link from 'next/link'
+import { createClient } from '@supabase/supabase-js'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: "Locations courte durée à Caen — Réservez directement",
-  description: "Appartements et maisons à Caen et en Normandie. Réservez directement chez Concierg'ori, sans frais Airbnb. Disponibilités en temps réel.",
+  description: "Appartements et maisons à Caen et en Normandie. Réservez directement chez Concierg'ori, sans frais Airbnb.",
   openGraph: {
     title: "Concierg'ori — Locations à Caen sans frais Airbnb",
     description: "Réservez directement vos séjours à Caen. Appartements et maisons de qualité, conciergerie locale.",
@@ -11,399 +16,481 @@ export const metadata: Metadata = {
   },
 }
 
-import Link from 'next/link'
-import { createClient } from '@supabase/supabase-js'
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+const GRAIN = `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+
+const SERVICES = [
+  { icon: '🗝️', title: 'Check-in flexibles',    sub: 'Arrivée à votre rythme',         gradient: 'linear-gradient(135deg,#1a3a5c,#0097b2)' },
+  { icon: '🧹', title: 'Ménage professionnel',   sub: 'Linge fourni, logement impeccable', gradient: 'linear-gradient(135deg,#2d4a1e,#4caf50)' },
+  { icon: '🛏️', title: 'Linge fourni',           sub: 'Draps et serviettes inclus',     gradient: 'linear-gradient(135deg,#4a2d1e,#c0714f)' },
+  { icon: '🗺️', title: 'Bonnes adresses',        sub: 'Guide local personnalisé',        gradient: 'linear-gradient(135deg,#1e2d4a,#5b7dbd)' },
+  { icon: '🛡️', title: 'Gestion des imprévus',   sub: 'Disponibles 7j/7',               gradient: 'linear-gradient(135deg,#3a1e4a,#9c5bc0)' },
+  { icon: '📊', title: 'Suivi réservations',     sub: 'Calendrier synchronisé',          gradient: 'linear-gradient(135deg,#4a1e2d,#c05b7d)' },
+]
+
+const STEPS = [
+  { icon: '📞', title: 'Prise de contact',       desc: 'Nous analysons votre bien et ses spécificités pour établir une stratégie de location adaptée.' },
+  { icon: '📸', title: 'Mise en ligne',           desc: 'Shooting professionnel, annonce optimisée, diffusion sur Airbnb et Booking.com.' },
+  { icon: '💰', title: 'Revenus automatiques',   desc: 'Vous recevez vos revenus chaque mois, nous gérons tout le reste.' },
+]
+
 export default async function LandingPage() {
   const { data: properties } = await supabase
     .from('properties')
-    .select('id, name, address, cover_image, base_price, max_guests, bedrooms')
+    .select('id, name, address, cover_image, base_price, max_guests, bedrooms, photos')
     .eq('tenant_id', '67b8314e-ce88-467a-9246-cb0558402e34')
     .order('name')
     .limit(6)
 
-  return (
-    <div className="font-[var(--font-quicksand)]" style={{ color: '#4b4b4b' }}>
+  const heroPhoto = properties?.[0]?.cover_image || null
 
+  return (
+    <>
       <Navbar />
 
-      {/* ── 2. HERO ───────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ backgroundColor: '#00243f' }}>
-        {/* Image de fond Caen */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1730882851443-08f3277b4a1b?w=1920&q=90"
-            alt="Caen, vue aérienne"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,36,63,0.72)' }} />
-        </div>
-        {/* Decorative background */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 70% 50%, rgba(0,151,178,0.08) 0%, transparent 60%)' }} />
+      {/* ═══════════════════════════════════════
+          HERO — Split 55/45
+      ═══════════════════════════════════════ */}
+      <section
+        id="hero"
+        className="relative overflow-hidden"
+        style={{ background: '#fff2e0', minHeight: '100vh', paddingTop: 68 }}
+      >
+        {/* Grain */}
+        <div className="absolute inset-0 z-[1] pointer-events-none opacity-[0.12]" style={{ backgroundImage: GRAIN, backgroundSize: '256px 256px' }} />
+        {/* Blob */}
+        <div className="absolute bottom-[-120px] left-[-80px] z-0 w-[480px] h-[480px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(115,199,214,0.10) 0%, transparent 70%)' }} />
 
-        <div className="relative max-w-6xl mx-auto px-6 py-24 md:py-32 flex flex-col items-center text-center">
-          {/* Trust badge */}
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium mb-8"
-            style={{ backgroundColor: 'rgba(0,151,178,0.1)', borderColor: 'rgba(0,151,178,0.3)', color: '#0097b2' }}
-          >
-            <span className="w-2 h-2 rounded-full bg-[#0097b2] animate-pulse" />
-            15+ biens gérés à Caen
-          </div>
+        {/* Grid 55/45 */}
+        <div className="relative z-[2] grid md:grid-cols-[55%_45%] min-h-[calc(100vh-68px)]">
 
-          {/* Headline */}
-          <h1 className="font-[var(--font-suez)] text-4xl md:text-6xl lg:text-7xl leading-tight mb-6 max-w-4xl" style={{ color: '#ffffff' }}>
-            Votre conciergerie<br />
-            <span style={{ color: '#0097b2' }}>Airbnb à Caen</span>
-          </h1>
-
-          {/* Subtext */}
-          <p className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>
-            Réservez directement chez Concierg'ori et <strong>économisez les frais de plateforme Airbnb</strong>.
-            Une gestion sur-mesure, une communication directe et des offres exclusives pour votre séjour en Normandie.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-16">
-            <a
-              href="#contact"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-full text-base font-semibold text-white transition-all hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
-              style={{ backgroundColor: '#0097b2' }}
+          {/* Left */}
+          <div className="flex flex-col justify-center px-8 md:px-20 py-16 order-2 md:order-1">
+            {/* Badge */}
+            <div
+              className="inline-flex items-center gap-2 w-fit px-4 py-[7px] rounded-full text-xs font-bold mb-6 animate-[fadeInUp_0.5s_0.1s_ease_forwards] opacity-0"
+              style={{ background: 'rgba(0,151,178,0.12)', border: '1px solid rgba(0,151,178,0.3)', color: '#0097b2' }}
             >
-              Réserver directement
-              <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
-            <a
-              href="#services"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-full text-base font-semibold border-2 transition-all hover:bg-[#0097b2]/10"
-              style={{ borderColor: '#0097b2', color: '#0097b2' }}
+              <span className="w-[7px] h-[7px] rounded-full bg-[#0097b2]" style={{ animation: 'pulse-dot 2s infinite' }} />
+              🌊 Conciergerie caennaise
+            </div>
+
+            {/* H1 */}
+            <h1
+              className="font-[var(--font-suez)] leading-[1.08] mb-6 animate-[fadeInUp_0.5s_0.15s_ease_forwards] opacity-0"
+              style={{ fontSize: 'clamp(40px,5vw,72px)', color: '#00243f' }}
             >
-              Découvrir nos services
-            </a>
-          </div>
+              Séjournez à Caen,<br />
+              <span style={{ color: '#0097b2' }}>sans les frais</span><br />
+              Airbnb
+            </h1>
 
-          {/* Stats row */}
-          <div className="flex flex-wrap justify-center gap-6 md:gap-16 text-center mt-8">
-            {[
-              { value: '15+', label: 'Biens gérés' },
-              { value: '200+', label: 'Voyageurs accueillis' },
-              { value: '4.9★', label: 'Note moyenne' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <div className="font-[var(--font-suez)] text-3xl" style={{ color: '#0097b2' }}>{stat.value}</div>
-                <div className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── LOGEMENTS ─────────────────────────────────────────────────── */}
-      <section id="logements" className="py-20 md:py-24" style={{ backgroundColor: '#fff2e0' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#0097b2' }}>Où séjourner</p>
-            <h2 className="font-[var(--font-suez)] text-3xl md:text-4xl mb-3" style={{ color: '#00243f' }}>
-              Nos logements
-            </h2>
-            <p className="text-base max-w-xl mx-auto" style={{ color: '#979797' }}>
-              Des appartements et maisons soigneusement sélectionnés au cœur de Caen et en bord de mer.
+            {/* Sous-titre */}
+            <p
+              className="text-lg leading-[1.7] mb-9 max-w-[460px] animate-[fadeInUp_0.5s_0.2s_ease_forwards] opacity-0"
+              style={{ color: '#5a5a5a' }}
+            >
+              Appartements et maisons sélectionnés à Caen. Réservez directement auprès de la conciergerie locale — moins cher, plus humain.
             </p>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            {(properties ?? []).map(prop => (
-              <Link key={prop.id} href={`/logements/${prop.id}`}
-                className="group rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 bg-white">
-                {prop.cover_image ? (
-                  <div className="h-56 overflow-hidden">
-                    <img src={prop.cover_image} alt={prop.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </div>
-                ) : (
-                  <div className="h-56 flex items-center justify-center text-4xl" style={{ backgroundColor: '#fff2e0' }}>🏠</div>
-                )}
-                <div className="p-5">
-                  <h3 className="font-[var(--font-alkatra)] font-bold text-base leading-snug mb-1 truncate" style={{ color: '#00243f' }}>{prop.name}</h3>
-                  <p className="text-xs mb-4 truncate" style={{ color: '#979797' }}>{prop.address}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-xs" style={{ color: '#979797' }}>
-                      {prop.bedrooms > 0 && <span>🛏 {prop.bedrooms} ch.</span>}
-                      {prop.max_guests > 0 && <span>👤 {prop.max_guests} pers.</span>}
-                    </div>
-                    {prop.base_price > 0 ? (
-                      <span className="font-bold text-sm" style={{ color: '#00243f' }}>{prop.base_price}€<span className="font-normal text-xs" style={{ color: '#979797' }}>/nuit</span></span>
-                    ) : (
-                      <span className="text-xs px-3 py-1 rounded-full text-white" style={{ backgroundColor: '#0097b2' }}>Voir</span>
-                    )}
-                  </div>
-                </div>
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-3 mb-14 animate-[fadeInUp_0.5s_0.25s_ease_forwards] opacity-0">
+              <Link
+                href="/logements"
+                className="inline-flex items-center px-8 py-4 rounded-full text-[15px] font-bold text-white transition-all duration-200 hover:-translate-y-0.5"
+                style={{ background: '#0097b2', boxShadow: '0 8px 28px rgba(0,151,178,0.35)' }}
+              >
+                Voir les logements →
               </Link>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link href="/logements"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold text-sm text-white transition-opacity hover:opacity-90"
-              style={{ backgroundColor: '#0097b2' }}>
-              Voir tous les logements →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. SERVICES GRID ──────────────────────────────────────────── */}
-      <section id="services" className="py-20 md:py-28" style={{ backgroundColor: 'rgba(115,199,214,0.12)' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#0097b2' }}>Ce que nous faisons</p>
-            <h2 className="font-[var(--font-alkatra)] text-3xl md:text-4xl font-bold" style={{ color: '#00243f' }}>
-              Nos services de conciergerie
-            </h2>
-            <p className="mt-4 max-w-xl mx-auto" style={{ color: '#4b4b4b' }}>
-              De l&apos;accueil à la maintenance, nous gérons tout pour que votre bien brille et que vos voyageurs repartent ravis.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { emoji: '🗝️', title: 'Check-in / Check-out', desc: 'Accueil personnalisé de vos voyageurs, remise des clés et état des lieux rigoureux à chaque départ.' },
-              { emoji: '🧹', title: 'Ménage professionnel', desc: 'Nettoyage en profondeur entre chaque séjour selon les standards hôteliers pour des avis 5 étoiles.' },
-              { emoji: '📅', title: 'Gestion calendrier', desc: 'Optimisation des disponibilités, synchronisation multi-plateformes et prix dynamiques pour maximiser vos revenus.' },
-              { emoji: '🛏️', title: 'Linge de maison', desc: 'Fourniture, lavage et repassage du linge hôtelier — draps, serviettes et peignoirs impeccables.' },
-              { emoji: '🔧', title: 'Maintenance 24/7', desc: 'Réactivité totale pour toute intervention technique : plomberie, électricité, petites réparations.' },
-              { emoji: '🎁', title: 'Cadeaux de bienvenue', desc: 'Paniers d\'accueil personnalisés avec produits locaux normands pour une première impression inoubliable.' },
-            ].map((service) => (
-              <div
-                key={service.title}
-                className="bg-white rounded-2xl p-7 border shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group"
-                style={{ borderColor: 'rgba(115,199,214,0.4)' }}
-              >
-                <div className="text-4xl mb-5">{service.emoji}</div>
-                <h3 className="font-[var(--font-alkatra)] text-lg font-semibold mb-2 group-hover:text-[#0097b2] transition-colors" style={{ color: '#00243f' }}>
-                  {service.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#4b4b4b' }}>{service.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. HOW IT WORKS ───────────────────────────────────────────── */}
-      <section className="py-20 md:py-28 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#0097b2' }}>Simple comme bonjour</p>
-            <h2 className="font-[var(--font-alkatra)] text-3xl md:text-4xl font-bold" style={{ color: '#00243f' }}>
-              Comment ça fonctionne ?
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 relative">
-            {/* Connecting line (desktop) */}
-            <div className="hidden md:block absolute top-12 left-[calc(16.666%+2rem)] right-[calc(16.666%+2rem)] h-0.5 bg-gradient-to-r from-transparent via-[#73c7d6] to-transparent" />
-
-            {[
-              { step: '01', title: 'Contactez-nous', desc: 'Envoyez-nous un message avec vos dates. On vous répond sous 2h pour confirmer la disponibilité et discuter de votre séjour.' },
-              { step: '02', title: 'On s\'occupe de tout', desc: "Concierg'ori prépare votre logement : ménage, linge frais, panier d'accueil et accueil personnalisé à votre arrivée." },
-              { step: '03', title: 'Vous encaissez', desc: 'Réglez directement, sans frais de plateforme. Vous profitez d\'un tarif avantageux et d\'un service premium. Simple et transparent.' },
-            ].map((item) => (
-              <div key={item.step} className="flex flex-col items-center text-center">
-                <div
-                  className="w-24 h-24 rounded-full flex items-center justify-center text-white font-[var(--font-suez)] text-2xl mb-6 shadow-lg"
-                  style={{ backgroundColor: '#0097b2' }}
-                >
-                  {item.step}
-                </div>
-                <h3 className="font-[var(--font-alkatra)] text-xl font-bold mb-3" style={{ color: '#00243f' }}>{item.title}</h3>
-                <p className="leading-relaxed" style={{ color: '#4b4b4b' }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5. WHY BOOK DIRECT ────────────────────────────────────────── */}
-      <section className="py-20 md:py-28" style={{ backgroundColor: '#00243f' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#0097b2' }}>La différence</p>
-            <h2 className="font-[var(--font-alkatra)] text-3xl md:text-4xl font-bold text-white">
-              Pourquoi réserver en direct ?
-            </h2>
-            <p className="mt-4 max-w-xl mx-auto text-white/60">
-              Évitez les intermédiaires et profitez d&apos;une expérience bien supérieure à ce qu&apos;offrent les plateformes.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: '💸',
-                title: 'Pas de frais plateforme',
-                desc: 'Airbnb prélève jusqu\'à 20% de frais voyageur. En réservant directement, vous payez le prix juste — et Concierg\'ori gagne plus.',
-                highlight: 'Économisez jusqu\'à 20%',
-              },
-              {
-                icon: '💬',
-                title: 'Communication directe',
-                desc: "Parlez directement à Concierg'ori via WhatsApp ou téléphone. Pas de messagerie filtrée, des réponses rapides et personnalisées.",
-                highlight: 'Réponse en moins de 2h',
-              },
-              {
-                icon: '🎯',
-                title: 'Offres exclusives',
-                desc: 'Séjours longs, retours réguliers, groupes — bénéficiez de tarifs préférentiels et d\'extras gratuits réservés aux clients directs.',
-                highlight: 'Tarifs sur-mesure',
-              },
-            ].map((benefit) => (
-              <div key={benefit.title} className="rounded-2xl p-8 border border-white/10 bg-white/5 hover:bg-white/10 transition-all">
-                <div className="text-4xl mb-5">{benefit.icon}</div>
-                <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 text-white" style={{ backgroundColor: '#0097b2' }}>
-                  {benefit.highlight}
-                </div>
-                <h3 className="font-[var(--font-alkatra)] text-lg font-bold text-white mb-3">{benefit.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">{benefit.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 6. TESTIMONIALS ───────────────────────────────────────────── */}
-      <section className="py-20 md:py-28" style={{ backgroundColor: '#fff2e0' }}>
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: '#0097b2' }}>Ils nous font confiance</p>
-            <h2 className="font-[var(--font-alkatra)] text-3xl md:text-4xl font-bold" style={{ color: '#00243f' }}>
-              Ce que disent nos voyageurs
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                name: 'Sophie & Marc',
-                location: 'Paris',
-                date: 'Novembre 2024',
-                rating: 5,
-                text: "Week-end parfait à Caen ! Concierg'ori nous a accueillis avec un panier de produits normands, c'était une vraie attention. L'appartement était impeccable. Et sans les frais Airbnb, on a économisé plus de 40€. On reviendra sans hésiter !",
-              },
-              {
-                name: 'Thomas L.',
-                location: 'Lyon',
-                date: 'Octobre 2024',
-                rating: 5,
-                text: 'Séjour d\'une semaine pour le travail. Communication ultra-réactive, logement propre comme un hôtel 4 étoiles et disponibilité 24/7 quand j\'ai eu un petit souci avec le chauffage. La réservation directe, c\'est vraiment le bon plan.',
-              },
-              {
-                name: 'Famille Bertrand',
-                location: 'Bordeaux',
-                date: 'Août 2024',
-                rating: 5,
-                text: "Vacances en famille avec 3 enfants, Concierg'ori a tout anticipé : lits bébé, Kit de bienvenue pour les petits, conseils sur les activités à Caen. Tarif négocié directement, bien mieux qu'Airbnb. Une adresse qu'on garde précieusement !",
-              },
-            ].map((testimonial) => (
-              <div key={testimonial.name} className="bg-white rounded-2xl p-7 shadow-sm border" style={{ borderColor: 'rgba(115,199,214,0.4)' }}>
-                {/* Stars */}
-                <div className="flex gap-1 mb-5">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <span key={i} className="text-lg" style={{ color: '#0097b2' }}>★</span>
-                  ))}
-                </div>
-                {/* Quote */}
-                <p className="text-sm leading-relaxed mb-6 italic" style={{ color: '#4b4b4b' }}>
-                  &ldquo;{testimonial.text}&rdquo;
-                </p>
-                {/* Author */}
-                <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: '#0097b2' }}>
-                    {testimonial.name[0]}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-sm" style={{ color: '#00243f' }}>{testimonial.name}</div>
-                    <div className="text-xs text-gray-500">{testimonial.location} · {testimonial.date}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 7. CTA SECTION ────────────────────────────────────────────── */}
-      <section id="contact" className="py-20 md:py-28 bg-white">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="rounded-3xl p-12 md:p-16" style={{ background: 'linear-gradient(135deg, #00243f 0%, #003d5c 100%)' }}>
-            <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: '#0097b2' }}>Réservation directe</p>
-            <h2 className="font-[var(--font-suez)] text-3xl md:text-4xl text-white mb-5">
-              Prêt à réserver ?
-            </h2>
-            <p className="text-white/60 mb-10 max-w-md mx-auto leading-relaxed">
-              Contactez Concierg'ori directement pour connaître les disponibilités, obtenir un tarif personnalisé et profiter d&apos;un séjour 5 étoiles à Caen.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <a
-                href="mailto:oriane@conciergori.fr"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white transition-all hover:opacity-90 hover:shadow-xl"
-                style={{ backgroundColor: '#0097b2' }}
+                href="#proprio"
+                className="inline-flex items-center px-8 py-4 rounded-full text-[15px] font-bold border-2 transition-colors duration-200"
+                style={{ borderColor: '#00243f', color: '#00243f' }}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                Envoyer un email
-              </a>
-              <a
-                href="https://wa.me/33600000000"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-base font-semibold border-2 border-white/30 text-white transition-all hover:bg-white/10"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.49" />
-                </svg>
-                WhatsApp
+                Confier mon bien
               </a>
             </div>
 
-            <p className="text-white/40 text-sm">
-              📍 Caen, Normandie · Réponse garantie sous 2h
-            </p>
+            {/* Stats mini */}
+            <div className="flex gap-10 pt-7 animate-[fadeInUp_0.5s_0.3s_ease_forwards] opacity-0" style={{ borderTop: '1px solid rgba(0,36,63,0.1)' }}>
+              {[
+                { val: '716', label: 'Évaluations' },
+                { val: '4,66★', label: 'Note moyenne' },
+                { val: '14', label: 'Logements' },
+              ].map(s => (
+                <div key={s.label}>
+                  <span className="block font-[var(--font-suez)] text-[30px] leading-none mb-1" style={{ color: '#0097b2' }}>{s.val}</span>
+                  <span className="text-[13px] font-semibold" style={{ color: '#5a5a5a' }}>{s.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {/* Right — Photo */}
+          <div className="relative order-1 md:order-2 min-h-[320px] md:min-h-0">
+            {heroPhoto
+              ? <img src={heroPhoto} alt="Logement Concierg'ori" className="w-full h-full object-cover" style={{ minHeight: 320 }} />
+              : <div className="w-full h-full flex items-center justify-center text-7xl opacity-40" style={{ background: 'linear-gradient(145deg,#e0d0b0,#c8b080)', minHeight: 320 }}>🏠</div>
+            }
+            {/* Gradient edge fondu */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, #fff2e0 0%, transparent 22%)' }} />
+
+            {/* Widget flottant */}
+            <div
+              className="absolute bottom-10 right-[-12px] hidden md:block z-10 bg-white rounded-[18px] p-5 w-[230px]"
+              style={{ boxShadow: '0 16px 48px rgba(0,36,63,0.18)' }}
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[2px] mb-1" style={{ color: '#0097b2' }}>Prochain dispo</p>
+              <p className="font-[var(--font-alkatra)] font-bold text-[15px] mb-2.5" style={{ color: '#00243f' }}>
+                {properties?.[0]?.name || 'Appartement Caen'}
+              </p>
+              <Link href="/logements" className="inline-block text-[11px] font-bold px-3 py-1.5 rounded-full" style={{ background: 'rgba(0,151,178,0.08)', color: '#0097b2' }}>
+                Voir les disponibilités →
+              </Link>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      {/* ── 8. FOOTER ─────────────────────────────────────────────────── */}
-      <footer id="tarifs" style={{ backgroundColor: '#fff2e0', borderTop: '1px solid #e8d8c0' }}>
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            {/* Logo */}
-            <a href="#"><img src="/logo.svg" alt="Concierg'ori" className="h-16 w-auto" /></a>
+      {/* ═══════════════════════════════════════
+          STATS BAND — navy
+      ═══════════════════════════════════════ */}
+      <section id="stats" className="relative overflow-hidden py-[72px]" style={{ background: '#00243f' }}>
+        {/* Blobs */}
+        <div className="absolute top-[-100px] right-[-100px] w-[400px] h-[400px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(115,199,214,0.10) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-80px] left-[-60px] w-[280px] h-[280px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,151,178,0.08) 0%, transparent 70%)' }} />
+        {/* Grain */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{ backgroundImage: GRAIN, backgroundSize: '256px' }} />
 
-            {/* Links */}
-            <nav className="flex flex-wrap justify-center gap-6">
-              <a href="#services" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Services</a>
-              <a href="/logements" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Logements</a>
-              <a href="#tarifs" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Tarifs</a>
-              <a href="#contact" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Contact</a>
-              <a href="#" className="text-sm hover:text-[#0097b2] transition-colors" style={{ color: '#4b4b4b' }}>Mentions légales</a>
-            </nav>
+        <div className="relative z-10 max-w-[900px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {[
+            { target: 716,  suffix: '',   label: 'Évaluations' },
+            { target: 466,  suffix: '',   label: 'Note moyenne', prefix: '', raw: '4,66★' },
+            { target: 9,    suffix: ' ans', label: "D'expérience" },
+            { target: 14,   suffix: '',   label: 'Logements' },
+          ].map((s) => (
+            <div key={s.label} className="text-center">
+              <span className="block font-[var(--font-suez)] text-[52px] leading-none mb-2" style={{ color: '#73c7d6' }}>
+                {s.raw
+                  ? s.raw
+                  : <CountUp target={s.target} suffix={s.suffix} prefix={s.prefix} />
+                }
+              </span>
+              <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.55)' }}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            {/* Copyright */}
-            <p className="text-sm" style={{ color: '#979797' }}>
-              © Concierg&apos;ori 2025 · Caen, Normandie
+      {/* ═══════════════════════════════════════
+          LOGEMENTS
+      ═══════════════════════════════════════ */}
+      <section id="logements" className="relative overflow-hidden py-[100px]" style={{ background: '#fff2e0' }}>
+        {/* Grain */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.12]" style={{ backgroundImage: GRAIN, backgroundSize: '256px' }} />
+
+        <div className="relative z-10 max-w-[1140px] mx-auto px-6">
+          <ScrollReveal>
+            <p className="text-[12px] font-bold tracking-[3px] uppercase text-center mb-2.5" style={{ color: '#0097b2' }}>Nos logements</p>
+            <h2 className="font-[var(--font-suez)] text-center mb-3.5" style={{ fontSize: 'clamp(28px,3.5vw,46px)', color: '#00243f', lineHeight: 1.15 }}>
+              Réservez directement,<br />économisez les frais
+            </h2>
+            <p className="text-[17px] text-center max-w-[500px] mx-auto" style={{ color: '#5a5a5a', lineHeight: 1.6 }}>
+              Des appartements et maisons soigneusement sélectionnés à Caen et en Normandie.
             </p>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-[52px]">
+            {(properties || []).map((p, i) => (
+              <ScrollReveal key={p.id} delay={i * 80}>
+                <Link href={`/logements/${p.id}`} className="block group">
+                  <div
+                    className="rounded-[20px] overflow-hidden border transition-all duration-300 group-hover:-translate-y-[5px]"
+                    style={{ background: '#fffdf8', borderColor: 'rgba(0,151,178,0.15)', boxShadow: '0 2px 12px rgba(0,36,63,0.04)' }}
+                  >
+                    {/* Photo */}
+                    <div className="relative h-[220px] overflow-hidden">
+                      {p.cover_image
+                        ? <img src={p.cover_image} alt={p.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        : <div className="w-full h-full flex items-center justify-center text-6xl opacity-40" style={{ background: 'linear-gradient(145deg,#e8d8c0,#d0bfa0)' }}>🏠</div>
+                      }
+                      {/* Badge rating */}
+                      <span className="absolute top-3 right-3 bg-white text-[12px] font-bold px-2.5 py-1 rounded-full shadow-md" style={{ color: '#00243f' }}>
+                        ⭐ 4.9
+                      </span>
+                      {/* Badge type */}
+                      <span className="absolute top-3 left-3 text-white text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: '#0097b2' }}>
+                        {p.bedrooms ? `${p.bedrooms} ch.` : 'Studio'}
+                      </span>
+                    </div>
+                    {/* Body */}
+                    <div className="p-5">
+                      <p className="text-[11px] font-bold tracking-[2px] uppercase mb-1" style={{ color: '#0097b2' }}>Caen</p>
+                      <p className="font-[var(--font-alkatra)] text-[17px] font-bold mb-0.5" style={{ color: '#00243f' }}>{p.name}</p>
+                      <p className="text-[13px] mb-3.5 truncate" style={{ color: '#5a5a5a' }}>{p.address || 'Caen, Normandie'}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-3 text-[12px]" style={{ color: '#5a5a5a' }}>
+                          <span>👤 {p.max_guests || 2}</span>
+                          <span>🛏 {p.bedrooms || 1}</span>
+                        </div>
+                        {p.base_price && (
+                          <p className="font-[var(--font-suez)] text-[20px]" style={{ color: '#00243f' }}>
+                            {p.base_price}€ <span className="font-[var(--font-quicksand)] text-[12px] font-medium" style={{ color: '#5a5a5a' }}>/nuit</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <ScrollReveal delay={200}>
+            <div className="text-center mt-12">
+              <Link
+                href="/logements"
+                className="inline-flex items-center px-8 py-4 rounded-full text-[15px] font-bold border-2 transition-all duration-200 hover:bg-[#00243f] hover:text-white"
+                style={{ borderColor: '#00243f', color: '#00243f' }}
+              >
+                Voir tous nos logements →
+              </Link>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          SERVICES
+      ═══════════════════════════════════════ */}
+      <section id="services" className="pb-[80px] pt-[100px]" style={{ background: '#fafafa' }}>
+        <div className="max-w-[1140px] mx-auto px-6 mb-12">
+          <ScrollReveal>
+            <p className="text-[12px] font-bold tracking-[3px] uppercase mb-2.5" style={{ color: '#0097b2' }}>Ce qu'on gère pour vous</p>
+            <h2 className="font-[var(--font-suez)] mb-3" style={{ fontSize: 'clamp(28px,3.5vw,46px)', color: '#00243f', lineHeight: 1.15 }}>
+              Une conciergerie<br />complète
+            </h2>
+            <p className="text-[17px] max-w-[500px]" style={{ color: '#5a5a5a', lineHeight: 1.6 }}>
+              De l'accueil des voyageurs à la gestion des imprévus, on s'occupe de tout.
+            </p>
+          </ScrollReveal>
+        </div>
+
+        <div className="max-w-[1140px] mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {SERVICES.map((s, i) => (
+            <ScrollReveal key={s.title} delay={i * 80}>
+              <div
+                className="relative h-[380px] rounded-[20px] overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-[6px]"
+                style={{ boxShadow: '0 4px 24px rgba(0,36,63,0.08)' }}
+              >
+                {/* BG gradient */}
+                <div className="absolute inset-0" style={{ background: s.gradient }} />
+                {/* Icon décoratif */}
+                <div className="absolute inset-0 flex items-center justify-center text-[80px] opacity-20 select-none">{s.icon}</div>
+                {/* Overlay */}
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' }} />
+                {/* Text bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <span className="block text-[24px] mb-2">{s.icon}</span>
+                  <p className="font-[var(--font-alkatra)] text-[17px] font-bold text-white leading-[1.3]">{s.title}</p>
+                  <p className="text-[13px] text-white/70 mt-1">{s.sub}</p>
+                </div>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          PROPRIÉTAIRES
+      ═══════════════════════════════════════ */}
+      <section id="proprio" className="relative overflow-hidden py-[100px]" style={{ background: '#fff2e0' }}>
+        {/* Blobs */}
+        <div className="absolute top-[-60px] right-[-80px] w-[350px] h-[350px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,151,178,0.07) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[-80px] left-[40px] w-[200px] h-[200px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,151,178,0.07) 0%, transparent 70%)' }} />
+
+        <div className="relative z-10 max-w-[700px] mx-auto px-6 text-center">
+          <ScrollReveal>
+            <p className="text-[12px] font-bold tracking-[3px] uppercase mb-3" style={{ color: '#0097b2' }}>Pour les propriétaires</p>
+            <h2 className="font-[var(--font-suez)] mb-4" style={{ fontSize: 'clamp(28px,3.5vw,48px)', color: '#00243f', lineHeight: 1.15 }}>
+              Confiez votre bien,<br />percevez vos revenus
+            </h2>
+            <p className="text-[18px] mb-14 mx-auto max-w-[540px]" style={{ color: '#5a5a5a', lineHeight: 1.65 }}>
+              Nous gérons tout — de la mise en ligne à la remise des clés — pour que vous n'ayez rien à faire.
+            </p>
+          </ScrollReveal>
+
+          <div className="mb-14">
+            {STEPS.map((step, i) => (
+              <ScrollReveal key={step.title} delay={i * 100}>
+                <div className="flex items-start gap-6 py-6 text-left" style={{ borderBottom: i < STEPS.length - 1 ? '1px solid rgba(0,36,63,0.08)' : 'none' }}>
+                  <div
+                    className="w-16 h-16 flex-shrink-0 rounded-full flex items-center justify-center text-2xl"
+                    style={{ border: '2px solid #0097b2', background: 'rgba(0,151,178,0.06)' }}
+                  >
+                    {step.icon}
+                  </div>
+                  <div>
+                    <p className="font-[var(--font-alkatra)] text-[17px] font-bold mb-1.5" style={{ color: '#00243f' }}>{step.title}</p>
+                    <p className="text-[14px] leading-[1.6]" style={{ color: '#5a5a5a' }}>{step.desc}</p>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <ScrollReveal delay={200}>
+            <a
+              href="mailto:contact@conciergori.fr"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-[15px] font-bold text-white transition-all duration-200 hover:-translate-y-0.5"
+              style={{ background: '#0097b2', boxShadow: '0 8px 28px rgba(0,151,178,0.3)' }}
+            >
+              Devenir partenaire →
+            </a>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          TÉMOIGNAGES
+      ═══════════════════════════════════════ */}
+      <section id="temoignages" className="relative overflow-hidden py-[100px]" style={{ background: '#fafafa' }}>
+        {/* Grain */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.12]" style={{ backgroundImage: GRAIN, backgroundSize: '256px' }} />
+        {/* Blobs */}
+        <div className="absolute top-[-60px] right-[-60px] w-[320px] h-[320px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(115,199,214,0.09) 0%, transparent 70%)' }} />
+        <div className="absolute bottom-[60px] left-[-80px] w-[260px] h-[260px] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,151,178,0.07) 0%, transparent 70%)' }} />
+
+        <div className="relative z-10 max-w-[1140px] mx-auto px-6">
+          <ScrollReveal>
+            <p className="text-[12px] font-bold tracking-[3px] uppercase text-center mb-2.5" style={{ color: '#0097b2' }}>Ils nous font confiance</p>
+            <h2 className="font-[var(--font-suez)] text-center mb-3" style={{ fontSize: 'clamp(28px,3.5vw,46px)', color: '#00243f', lineHeight: 1.15 }}>
+              716 avis positifs
+            </h2>
+            <p className="text-[17px] text-center max-w-[420px] mx-auto" style={{ color: '#5a5a5a', lineHeight: 1.6 }}>
+              Note moyenne de 4,66★ sur Airbnb — nos voyageurs parlent pour nous.
+            </p>
+          </ScrollReveal>
+        </div>
+
+        <div className="mt-12 relative z-10">
+          <TestimonialsCarousel />
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          CTA FINAL
+      ═══════════════════════════════════════ */}
+      <section id="cta-final" className="relative overflow-hidden py-[100px]" style={{ background: '#fff2e0' }}>
+        <ScrollReveal>
+          <div
+            className="relative overflow-hidden text-center mx-auto px-10 md:px-20 py-[80px] rounded-[28px]"
+            style={{ background: '#00243f', maxWidth: 'min(1100px, 95vw)' }}
+          >
+            {/* Circles décoratifs */}
+            <div className="absolute top-[-100px] right-[-80px] w-[320px] h-[320px] rounded-full" style={{ background: '#fff', opacity: 0.08 }} />
+            <div className="absolute bottom-[-70px] left-[-50px] w-[200px] h-[200px] rounded-full" style={{ background: '#fff', opacity: 0.08 }} />
+            <div className="absolute top-1/2 right-[28%] -translate-y-1/2 w-[140px] h-[140px] rounded-full" style={{ background: '#fff', opacity: 0.08 }} />
+            {/* Grain */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{ backgroundImage: GRAIN, backgroundSize: '256px' }} />
+
+            <div className="relative z-10">
+              <p className="text-[12px] font-bold tracking-[3px] uppercase mb-4" style={{ color: '#0097b2' }}>Prêt à réserver ?</p>
+              <h2 className="font-[var(--font-suez)] text-white mb-4" style={{ fontSize: 'clamp(30px,4vw,52px)', lineHeight: 1.15 }}>
+                Votre prochain séjour<br />à Caen commence ici
+              </h2>
+              <p className="text-[17px] max-w-[500px] mx-auto mb-11" style={{ color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+                Réservez directement et économisez les frais de service Airbnb. Conciergerie locale, logements soignés.
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Link
+                  href="/logements"
+                  className="inline-flex items-center px-8 py-4 rounded-full text-[15px] font-bold text-white transition-all duration-200 hover:-translate-y-0.5"
+                  style={{ background: '#0097b2', boxShadow: '0 8px 28px rgba(0,151,178,0.4)' }}
+                >
+                  Voir les logements
+                </Link>
+                <a
+                  href="mailto:contact@conciergori.fr"
+                  className="inline-flex items-center px-8 py-4 rounded-full text-[15px] font-bold text-white transition-all duration-200 hover:bg-white/10"
+                  style={{ border: '2px solid rgba(255,255,255,0.35)' }}
+                >
+                  Confier mon bien
+                </a>
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* ═══════════════════════════════════════
+          FOOTER
+      ═══════════════════════════════════════ */}
+      <footer style={{ background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,0.06)', padding: '64px 48px 32px' }}>
+        <div className="max-w-[1140px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr] gap-14 mb-12">
+            {/* Brand */}
+            <div>
+              <p className="font-[var(--font-alkatra)] text-[28px] font-bold mb-3" style={{ color: '#fff' }}>
+                Concierg<span style={{ color: '#0097b2' }}>&apos;ori</span>
+              </p>
+              <p className="text-[14px] leading-[1.6]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                Conciergerie locale à Caen.<br />
+                Votre séjour en Normandie, sans les complications.
+              </p>
+            </div>
+            {/* Nav */}
+            <div>
+              <p className="text-[12px] font-bold tracking-[2px] uppercase mb-5" style={{ color: 'rgba(255,255,255,0.9)' }}>Navigation</p>
+              <ul className="space-y-3">
+                {[
+                  { href: '/logements', label: 'Nos logements' },
+                  { href: '#services',  label: 'Services' },
+                  { href: '#proprio',   label: 'Propriétaires' },
+                ].map(l => (
+                  <li key={l.href}>
+                    <a href={l.href} className="text-[14px] transition-colors duration-200 hover:text-white" style={{ color: 'rgba(255,255,255,0.5)' }}>{l.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Contact */}
+            <div>
+              <p className="text-[12px] font-bold tracking-[2px] uppercase mb-5" style={{ color: 'rgba(255,255,255,0.9)' }}>Contact</p>
+              <div className="space-y-3">
+                <a href="mailto:contact@conciergori.fr" className="flex items-center gap-2.5 text-[14px] transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                  contact@conciergori.fr
+                </a>
+                <p className="flex items-center gap-2.5 text-[14px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  Caen, Normandie
+                </p>
+              </div>
+              <div className="flex gap-3 mt-5">
+                {[
+                  { href: 'https://www.airbnb.fr', label: 'Airbnb', icon: '🏠' },
+                ].map(s => (
+                  <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer"
+                    className="w-9 h-9 rounded-[10px] flex items-center justify-center text-lg transition-all duration-200 hover:bg-white/10"
+                    style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
+                    {s.icon}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6 text-center text-[13px]" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+            © 2025 Concierg&apos;ori · Fait avec ❤️ en Normandie
           </div>
         </div>
       </footer>
-
-    </div>
+    </>
   )
 }
