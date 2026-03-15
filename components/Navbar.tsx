@@ -17,6 +17,7 @@ export default function Navbar() {
     { href: '#logements',   label: 'Logements' },
     { href: '#services',    label: 'Services' },
     { href: '#proprio',     label: 'Propriétaires' },
+    { href: '/a-propos', label: 'À propos' },
     { href: '/confier-mon-bien', label: 'Confier mon bien' },
   ]
 

@@ -39,6 +39,13 @@ const STEPS = [
 ]
 
 export default async function LandingPage() {
+  const { data: testimonials } = await supabase
+    .from('testimonials')
+    .select('id, author_name, author_location, text, rating, source')
+    .eq('tenant_id', '67b8314e-ce88-467a-9246-cb0558402e34')
+    .eq('visible', true)
+    .order('created_at', { ascending: false })
+
   const { data: properties } = await supabase
     .from('properties')
     .select('id, name, address, cover_image, base_price, max_guests, bedrooms, photos')
@@ -379,7 +386,7 @@ export default async function LandingPage() {
         </div>
 
         <div className="mt-12 relative z-10">
-          <TestimonialsCarousel />
+          <TestimonialsCarousel reviews={testimonials ?? []} />
         </div>
       </section>
 

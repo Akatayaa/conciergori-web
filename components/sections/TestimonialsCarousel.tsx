@@ -2,19 +2,27 @@
 
 import { useRef, useEffect } from 'react'
 
-const REVIEWS = [
-  { name: 'Frédérique', location: 'Bouc-Bel-Air', text: "Logement fidèle à la description ; propre, bien équipé. Notre hôte est réactive et cordiale ; je recommande sans hésiter" },
-  { name: 'Mohamed',    location: '',              text: "Logement très agréable et très propre. C'est la 2ème fois que nous y passons et sûrement pas la dernière. À très vite" },
-  { name: 'Mathilda',   location: 'Caen',          text: "Très bon logement, la literie est très agréable. Notre hôte est très arrangeante, je recommande fortement" },
-  { name: 'Matthieu',   location: 'Saint-Germain-en-Laye', text: "Très bon séjour à Caen. Studio très calme, ambiance cocooning. Les instructions d'arrivée étaient très claires" },
-  { name: 'Yvonne',     location: 'Montreuil',     text: "Le logement correspond parfaitement à la description. Notre hôte est très réactive et nous a permis de rester plus longtemps. Je recommande !" },
-  { name: 'Alexandra',  location: '',              text: "Super séjour ! Logement confortable, conforme à l'annonce. Notre hôte disponible et réactive du début à la fin. Je recommande sans hésiter !" },
-  { name: 'Kelly',      location: '',              text: "Si vous allez à Caen, n'hésitez pas à séjourner ici. Spacieux et magnifique, comme sur les photos. Réponses claires et avec beaucoup de gentillesse" },
-  { name: 'Idrissa',    location: 'Toulouse',      text: "Logement somptueux et confortable" },
-  { name: 'Bernard',    location: 'Saint-Palais',  text: "Logement très propre, central avec vue sur les quais et silencieux" },
+interface Review {
+  id: string
+  author_name: string
+  author_location?: string
+  text: string
+  rating?: number
+}
+
+const FALLBACK: Review[] = [
+  { id: '1', author_name: 'Frédérique', author_location: 'Bouc-Bel-Air', text: "Logement fidèle à la description ; propre, bien équipé. Notre hôte est réactive et cordiale ; je recommande sans hésiter" },
+  { id: '2', author_name: 'Mohamed',    text: "Logement très agréable et très propre. C'est la 2ème fois que nous y passons et sûrement pas la dernière. À très vite" },
+  { id: '3', author_name: 'Mathilda',   author_location: 'Caen', text: "Très bon logement, la literie est très agréable. Notre hôte est très arrangeante, je recommande fortement" },
+  { id: '4', author_name: 'Matthieu',   author_location: 'Saint-Germain-en-Laye', text: "Très bon séjour à Caen. Studio très calme, ambiance cocooning. Les instructions d'arrivée étaient très claires" },
+  { id: '5', author_name: 'Yvonne',     author_location: 'Montreuil', text: "Le logement correspond parfaitement à la description. Notre hôte est très réactive et nous a permis de rester plus longtemps. Je recommande !" },
+  { id: '6', author_name: 'Alexandra',  text: "Super séjour ! Logement confortable, conforme à l'annonce. Notre hôte disponible et réactive du début à la fin. Je recommande sans hésiter !" },
+  { id: '7', author_name: 'Kelly',      text: "Si vous allez à Caen, n'hésitez pas à séjourner ici. Spacieux et magnifique, comme sur les photos. Réponses claires et avec beaucoup de gentillesse" },
+  { id: '8', author_name: 'Idrissa', author_location: 'Toulouse', text: "Logement somptueux et confortable" },
+  { id: '9', author_name: 'Bernard', author_location: 'Saint-Palais', text: "Logement très propre, central avec vue sur les quais et silencieux" },
 ]
 
-function Card({ name, location, text }: { name: string; location: string; text: string }) {
+function Card({ name, location, text }: { name: string; location?: string; text: string }) {
   return (
     <div
       className="flex-none w-[300px] min-h-[220px] rounded-[20px] p-7 border flex flex-col relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -50,7 +58,7 @@ function Card({ name, location, text }: { name: string; location: string; text: 
   )
 }
 
-export default function TestimonialsCarousel() {
+export default function TestimonialsCarousel({ reviews }: { reviews?: Review[] }) {
   const trackRef = useRef<HTMLDivElement>(null)
   const isDragging = useRef(false)
   const startX = useRef(0)
@@ -85,13 +93,14 @@ export default function TestimonialsCarousel() {
     }
   }, [])
 
-  const doubled = [...REVIEWS, ...REVIEWS]
+  const data = (reviews && reviews.length > 0) ? reviews : FALLBACK
+  const doubled = [...data, ...data]
 
   return (
     <div className="temo-track-outer">
       <div ref={trackRef} className="temo-track">
         {doubled.map((r, i) => (
-          <Card key={i} {...r} />
+          <Card key={i} name={r.author_name} location={r.author_location} text={r.text} />
         ))}
       </div>
     </div>
