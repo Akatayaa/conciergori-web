@@ -59,12 +59,14 @@ export async function getTenantByDomain(domain: string): Promise<TenantConfig | 
 }
 
 export async function getTenantFromRequest(hostname: string): Promise<TenantConfig | null> {
+  const cleanHostname = hostname.split(':')[0] // retirer le port
+
   // 1. Essayer par domaine custom (conciergori.fr)
-  const byDomain = await getTenantByDomain(hostname)
+  const byDomain = await getTenantByDomain(cleanHostname)
   if (byDomain) return byDomain
 
-  // 2. Extraire le slug depuis un sous-domaine Vercel (tenant.sejour.app)
-  const parts = hostname.split('.')
+  // 2. Extraire le slug depuis un sous-domaine sejour.app (tenant.sejour.app)
+  const parts = cleanHostname.split('.')
   if (parts.length >= 3) {
     const subdomain = parts[0]
     const bySlug = await getTenantBySlug(subdomain)
