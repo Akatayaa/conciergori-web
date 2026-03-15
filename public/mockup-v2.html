@@ -340,12 +340,13 @@ nav.scrolled .nav-cta { background: var(--teal); }
 }
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 380px));
+  justify-content: center;
   gap: 20px;
   padding: 0 48px;
 }
 .svc-card {
-  flex: 0 0 280px; height: 280px;
+  height: 380px;
   border-radius: 20px; overflow: hidden;
   position: relative; cursor: pointer;
   transition: transform 0.3s ease;
@@ -393,23 +394,19 @@ nav.scrolled .nav-cta { background: var(--teal); }
 .proprio-header { margin-bottom: 56px; text-align: center; }
 .proprio-title { font-family: var(--font-h); font-size: clamp(28px,3.5vw,48px); color: var(--navy); line-height: 1.15; margin-bottom: 16px; text-align: center; }
 .proprio-sub { font-size: 18px; color: #5a5a5a; max-width: 540px; line-height: 1.65; text-align: center; margin: 0 auto; }
-.proprio-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; margin-bottom: 52px; position: relative; }
-.proprio-steps::before {
-  content: ''; position: absolute;
-  top: 36px; left: calc(16.666% + 20px); right: calc(16.666% + 20px);
-  height: 1px; background: rgba(0,151,178,0.2);
-}
-.pstep { text-align: center; }
+.proprio-steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 52px; }
+.proprio-steps::before { content: none; }
+.pstep { display: flex; align-items: flex-start; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.pstep:last-child { border-bottom: none; }
 .pstep-num {
-  width: 72px; height: 72px; border-radius: 50%;
+  width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%;
   border: 2px solid var(--teal);
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px;
-  font-size: 26px;
-  background: rgba(0,151,178,0.06);
-  position: relative; background-color: var(--cream);
+  font-size: 24px;
+  background: rgba(0,151,178,0.08);
+  background-color: rgba(0,151,178,0.06);
 }
-.pstep-title { font-family: var(--font-sub); font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.pstep-title { font-family: var(--font-sub); font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
 .pstep-desc { font-size: 14px; color: #5a5a5a; line-height: 1.6; }
 .btn-white {
   background: #fff; color: var(--navy);
