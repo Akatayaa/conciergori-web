@@ -1,8 +1,8 @@
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Service role pour bypasser RLS sur les routes API
-const supabase = createSupabaseClient(
+const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
@@ -24,12 +24,13 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { tenant_id, booking_id, additional_fees = [] } = body
+  const { tenant_id, booking_id, additional_fees = [], profile_id } = body
 
   if (!tenant_id || !booking_id) {
     return NextResponse.json({ error: 'tenant_id and booking_id required' }, { status: 400 })
   }
 
+  // Récupérer la réservation
   const { data: booking, error: bErr } = await supabase
     .from('bookings')
     .select('*, properties(name)')
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
     .single()
   if (bErr || !booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
+  // Récupérer les settings de facturation
   const { data: settings } = await supabase
     .from('invoice_settings')
     .select('*')
@@ -46,15 +48,48 @@ export async function POST(req: NextRequest) {
   const concierge_rate = settings?.concierge_rate ?? 20
   const invoice_prefix = settings?.invoice_prefix ?? 'FAC'
 
+  // Calcul
   const checkIn = new Date(booking.check_in)
   const checkOut = new Date(booking.check_out)
   const nights = Math.round((checkOut.getTime() - checkIn.getTime()) / 86400000)
-  const nightly_total = booking.total_price ?? (booking.base_price * nights)
-  const concierge_fee = Math.round((nightly_total * concierge_rate) / 100 * 100) / 100
-  const fees_total = additional_fees.reduce((sum: number, f: { amount: number; enabled?: boolean }) =>
-    f.enabled !== false ? sum + (f.amount || 0) : sum, 0)
+  const nightly_total = booking.total_price ?? booking.base_price * nights
+  const concierge_fee = Math.round(((nightly_total * concierge_rate) / 100) * 100) / 100
+
+  // Résoudre les lignes additionnelles :
+  // Si profile_id fourni → charger le profil et utiliser ses lignes
+  // Sinon → utiliser additional_fees du body
+  let resolvedFees: { name: string; amount: number; enabled?: boolean }[] = additional_fees
+
+  if (profile_id) {
+    const { data: profile, error: pErr } = await supabase
+      .from('invoice_profiles')
+      .select('lines')
+      .eq('id', profile_id)
+      .single()
+
+    if (pErr || !profile) {
+      return NextResponse.json({ error: `Profile not found: ${profile_id}` }, { status: 404 })
+    }
+
+    // Convertir les lignes du profil au format additional_fees
+    // { description, quantity, unit_price } → { name, amount }
+    resolvedFees = (profile.lines as { description: string; quantity: number; unit_price: number }[]).map(
+      (line) => ({
+        name: line.description,
+        amount: line.quantity * line.unit_price,
+        enabled: true,
+      })
+    )
+  }
+
+  const fees_total = resolvedFees.reduce(
+    (sum: number, f: { amount: number; enabled?: boolean }) =>
+      f.enabled !== false ? sum + (f.amount || 0) : sum,
+    0
+  )
   const total = concierge_fee + fees_total
 
+  // Numéro de facture auto-incrémenté
   const { data: settingsRow } = await supabase
     .from('invoice_settings')
     .select('next_invoice_number')
@@ -82,7 +117,7 @@ export async function POST(req: NextRequest) {
       nightly_total,
       concierge_rate,
       concierge_fee,
-      additional_fees,
+      additional_fees: resolvedFees,
       total,
       status: 'draft',
     })
