@@ -91,6 +91,9 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
           </button>
         )}
 
+        {/* Export iCal */}
+        <ExportIcalButton propertyId={prop.id} />
+
         {/* Règles */}
         <Link href="/conciergori/dashboard/pricing"
           className="text-xs px-2.5 py-1 rounded-lg font-medium hover:opacity-80"
@@ -99,5 +102,25 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
         </Link>
       </div>
     </div>
+  )
+}
+
+// ── Export iCal button ──────────────────────────────────────────────────────
+function ExportIcalButton({ propertyId }: { propertyId: string }) {
+  const [copied, setCopied] = useState(false)
+  const url = `${process.env.NEXT_PUBLIC_APP_URL || 'https://conciergori.fr'}/api/ical/${propertyId}`
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <button onClick={copy} title={`Copier l'URL iCal export : ${url}`}
+      className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg font-medium hover:opacity-80 transition-all"
+      style={{ backgroundColor: copied ? '#d1fae5' : '#e6f7fa', color: copied ? '#065f46' : '#0097b2' }}>
+      {copied ? '✓ Copié !' : '📤 Export iCal'}
+    </button>
   )
 }
