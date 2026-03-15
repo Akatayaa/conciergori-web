@@ -81,12 +81,24 @@ export async function GET(req: NextRequest) {
         ),
       }))
 
+    // Revenus mensuels 6 mois
+    const monthlyRevenue = Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
+      const dEnd = new Date(now.getFullYear(), now.getMonth() - (5 - i) + 1, 1)
+      const label = d.toLocaleDateString('fr-FR', { month: 'short' })
+      const value = confirmed
+        .filter(b => new Date(b.check_in) >= d && new Date(b.check_in) < dEnd)
+        .reduce((s, b) => s + (b.total_price || 0), 0)
+      return { label, value: Math.round(value * (owner.owner_commission / 100)) }
+    })
+
     return {
       id: prop.id,
       name: prop.name,
       cover_image: prop.cover_image,
       stats: { ownerMonth, ownerTotal, totalNights },
       upcoming,
+      monthlyRevenue,
     }
   })
 
