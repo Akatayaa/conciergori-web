@@ -135,7 +135,7 @@ export default async function LogementsPage() {
           <div className="flex gap-6 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
             <Link href="/" className="hover:text-white transition-colors">Accueil</Link>
             <Link href="/logements" className="hover:text-white transition-colors">Logements</Link>
-            <a href="mailto:contact@conciergori.fr" className="hover:text-white transition-colors">Contact</a>
+            <a href="/confier-mon-bien" className="hover:text-white transition-colors">Contact</a>
           </div>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>© 2025 Concierg&apos;ori · Caen, Normandie</p>
         </div>
