@@ -1,3 +1,4 @@
+import { sendBookingConfirmation } from '@/lib/send-booking-confirmation'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 const supabase = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 import { NextRequest, NextResponse } from 'next/server'
@@ -71,5 +72,19 @@ export async function POST(req: NextRequest) {
   }).select().single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Email de confirmation au voyageur (fire & forget)
+  const { data: propName } = await supabase.from('properties').select('name').eq('id', property_id).single()
+  sendBookingConfirmation({
+    tenantId: property.tenant_id,
+    guestName: guest_name.trim(),
+    guestEmail: guest_email.trim().toLowerCase(),
+    propertyName: propName?.name ?? 'Logement',
+    checkinDate: new Date(check_in).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+    checkoutDate: new Date(check_out).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+    guests: guests || 1,
+    totalPrice: total_price || 0,
+  }).catch(console.error)
+
   return NextResponse.json(data, { status: 201 })
 }

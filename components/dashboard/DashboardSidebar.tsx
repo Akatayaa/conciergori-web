@@ -19,6 +19,7 @@ const NAV = [
   { href: 'dashboard/proprietaires', label: '🏠 Propriétaires' },
   { href: 'dashboard/facturation',   label: '🧾 Facturation' },
   { href: 'dashboard/livrets',        label: "📋 Livrets d'accueil" },
+  { href: 'dashboard/emails',         label: "✉️ Templates email" },
   { href: 'dashboard/pricing',       label: '💰 Prix & règles' },
 ]
 
