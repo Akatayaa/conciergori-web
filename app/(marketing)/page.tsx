@@ -5,6 +5,7 @@ import TestimonialsCarousel from '@/components/sections/TestimonialsCarousel'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import type { Metadata } from 'next'
+import { getTenantConfigFromHeaders } from '@/lib/use-tenant-config'
 
 export const metadata: Metadata = {
   title: "Locations courte durée à Caen — Réservez directement",
@@ -38,11 +39,10 @@ const STEPS = [
   { icon: '💰', title: 'Revenus automatiques',   desc: 'Vous recevez vos revenus chaque mois, nous gérons tout le reste.' },
 ]
 
-const TENANT_SLUG = process.env.TENANT_SLUG || 'conciergori'
 
 export default async function LandingPage() {
-  const { data: tenantRow } = await supabase.from('tenants').select('id').eq('slug', TENANT_SLUG).single()
-  const tenantId = tenantRow?.id ?? ''
+  const tenant = await getTenantConfigFromHeaders()
+  const tenantId = tenant?.id ?? ''
 
   const { data: testimonials } = await supabase
     .from('testimonials')

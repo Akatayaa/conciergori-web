@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   },
 }
 
+import { getTenantConfigFromHeaders } from '@/lib/use-tenant-config'
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -28,8 +30,7 @@ function getPropertyType(name: string): string {
 }
 
 export default async function LogementsPage() {
-  const { data: tenant } = await supabase
-    .from('tenants').select('id').eq('slug', 'conciergori').single()
+  const tenant = await getTenantConfigFromHeaders()
 
   const { data: properties } = await supabase
     .from('properties')
