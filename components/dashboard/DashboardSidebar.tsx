@@ -18,6 +18,7 @@ const NAV = [
   { href: 'dashboard/menage',        label: '🧹 Ménage' },
   { href: 'dashboard/proprietaires', label: '🏠 Propriétaires' },
   { href: 'dashboard/facturation',   label: '🧾 Facturation' },
+  { href: 'dashboard/livrets',        label: "📋 Livrets d'accueil" },
   { href: 'dashboard/pricing',       label: '💰 Prix & règles' },
 ]
 
