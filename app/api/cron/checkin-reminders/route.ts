@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     </div></div>`
 
   await resend.emails.send({
-    from: "Concierg'ori <notifications@conciergori.fr>",
+    from: process.env.RESEND_FROM || "Concierg'ori <notifications@conciergori.fr>",
     to: 'conciergori@outlook.fr',
     subject: `🌅 ${tomorrow_b.length + in2days_b.length} arrivée${tomorrow_b.length + in2days_b.length > 1 ? 's' : ''} — ${tomorrow.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`,
     html,

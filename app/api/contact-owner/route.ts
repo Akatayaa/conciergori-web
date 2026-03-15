@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     }
 
     await resend.emails.send({
-      from: "Concierg'ori <notifications@conciergori.fr>",
+      from: process.env.RESEND_FROM || "Concierg'ori <notifications@conciergori.fr>",
       to: process.env.HOST_EMAIL || 'conciergori@outlook.fr',
       replyTo: email,
       subject: `Nouvelle demande propriétaire — ${name}`,

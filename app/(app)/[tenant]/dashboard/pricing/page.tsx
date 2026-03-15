@@ -6,8 +6,13 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export default async function PricingPage() {
-  const tenantId = '67b8314e-ce88-467a-9246-cb0558402e34'
+import { notFound } from 'next/navigation'
+
+export default async function PricingPage({ params }: { params: Promise<{ tenant: string }> }) {
+  const { tenant: tenantSlug } = await params
+  const { data: tenantRow } = await supabase.from('tenants').select('id').eq('slug', tenantSlug).single()
+  if (!tenantRow) return notFound()
+  const tenantId = tenantRow.id
 
   const { data: properties } = await supabase
     .from('properties')

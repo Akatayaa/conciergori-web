@@ -7,10 +7,10 @@ const supabase = createClient(
 )
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = 'https://conciergori.fr'
+  const base = process.env.NEXT_PUBLIC_APP_URL || 'https://conciergori.fr'
 
   const { data: tenant } = await supabase
-    .from('tenants').select('id').eq('slug', 'conciergori').single()
+    .from('tenants').select('id').eq('slug', process.env.TENANT_SLUG || 'conciergori').single()
 
   const { data: properties } = await supabase
     .from('properties').select('id, updated_at').eq('tenant_id', tenant?.id ?? '')

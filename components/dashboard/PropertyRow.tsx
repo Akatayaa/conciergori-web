@@ -102,7 +102,7 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
         </Link>
 
         {/* Règles */}
-        <Link href="/conciergori/dashboard/pricing"
+        <Link href="../dashboard/pricing"
           className="text-xs px-2.5 py-1 rounded-lg font-medium hover:opacity-80"
           style={{ backgroundColor: '#fff2e0', color: '#0097b2' }}>
           💰 Règles

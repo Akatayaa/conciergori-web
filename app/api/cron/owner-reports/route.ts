@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
     `)
 
     await resend.emails.send({
-      from: "Concierg'ori <notifications@conciergori.fr>",
+      from: process.env.RESEND_FROM || "Concierg'ori <notifications@conciergori.fr>",
       to: owner.email,
       subject: `📊 Votre rapport ${monthLabel} — Concierg'ori`,
       html,

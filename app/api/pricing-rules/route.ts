@@ -17,7 +17,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const tenantId = '67b8314e-ce88-467a-9246-cb0558402e34'
+  // Résoudre le tenant depuis la propriété
+  const { property_id: propId } = body
+  let tenantId = body.tenant_id
+  if (!tenantId && propId) {
+    const { data: prop } = await supabase.from('properties').select('tenant_id').eq('id', propId).single()
+    tenantId = prop?.tenant_id
+  }
+  if (!tenantId) return NextResponse.json({ error: 'tenant_id requis' }, { status: 400 })
   const { data, error } = await supabase
     .from('pricing_rules')
     .insert({ ...body, tenant_id: tenantId })

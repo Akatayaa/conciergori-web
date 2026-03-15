@@ -84,7 +84,7 @@ export async function sendBookingConfirmation(data: BookingEmailData) {
 
   try {
     await resend.emails.send({
-      from: "Concierg'ori <notifications@conciergori.fr>",
+      from: process.env.RESEND_FROM || "Concierg'ori <notifications@conciergori.fr>",
       to: data.guestEmail,
       subject,
       html,

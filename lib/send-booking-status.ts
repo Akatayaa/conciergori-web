@@ -31,7 +31,7 @@ export async function sendBookingStatusEmail(bookingId: string, newStatus: 'conf
 
   if (newStatus === 'confirmed') {
     await resend.emails.send({
-      from: "Concierg'ori <notifications@conciergori.fr>",
+      from: process.env.RESEND_FROM || "Concierg'ori <notifications@conciergori.fr>",
       to: b.guest_email,
       subject: `✅ Réservation confirmée — ${propName}`,
       html: WRAPPER(`
@@ -50,7 +50,7 @@ export async function sendBookingStatusEmail(bookingId: string, newStatus: 'conf
     })
   } else {
     await resend.emails.send({
-      from: "Concierg'ori <notifications@conciergori.fr>",
+      from: process.env.RESEND_FROM || "Concierg'ori <notifications@conciergori.fr>",
       to: b.guest_email,
       subject: `Votre demande de réservation — ${propName}`,
       html: WRAPPER(`
@@ -59,7 +59,7 @@ export async function sendBookingStatusEmail(bookingId: string, newStatus: 'conf
         <p style="color:#5a5a5a">Les raisons peuvent être diverses : logement déjà réservé sur d'autres plateformes, dates indisponibles, etc.</p>
         <p style="color:#5a5a5a">N'hésitez pas à consulter nos autres logements disponibles ou à nous contacter directement.</p>
         <div style="margin:24px 0;text-align:center">
-          <a href="https://conciergori.fr/logements" style="display:inline-block;padding:12px 28px;background:#0097b2;color:white;text-decoration:none;border-radius:100px;font-weight:bold">Voir d'autres logements</a>
+          <a href='https://conciergori.fr/logements' style="display:inline-block;padding:12px 28px;background:#0097b2;color:white;text-decoration:none;border-radius:100px;font-weight:bold">Voir d'autres logements</a>
         </div>
         <p style="color:#5a5a5a">Cordialement,<br><strong>Notre équipe</strong></p>
       `),

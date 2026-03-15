@@ -38,18 +38,23 @@ const STEPS = [
   { icon: '💰', title: 'Revenus automatiques',   desc: 'Vous recevez vos revenus chaque mois, nous gérons tout le reste.' },
 ]
 
+const TENANT_SLUG = process.env.TENANT_SLUG || 'conciergori'
+
 export default async function LandingPage() {
+  const { data: tenantRow } = await supabase.from('tenants').select('id').eq('slug', TENANT_SLUG).single()
+  const tenantId = tenantRow?.id ?? ''
+
   const { data: testimonials } = await supabase
     .from('testimonials')
     .select('id, author_name, author_location, text, rating, source')
-    .eq('tenant_id', '67b8314e-ce88-467a-9246-cb0558402e34')
+    .eq('tenant_id', tenantId)
     .eq('visible', true)
     .order('created_at', { ascending: false })
 
   const { data: properties } = await supabase
     .from('properties')
     .select('id, name, address, cover_image, base_price, max_guests, bedrooms, photos')
-    .eq('tenant_id', '67b8314e-ce88-467a-9246-cb0558402e34')
+    .eq('tenant_id', tenantId)
     .order('name')
     .limit(6)
 
