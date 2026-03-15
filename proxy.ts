@@ -8,7 +8,7 @@ export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname
   const isDashboard = pathname.match(/^\/[^/]+\/dashboard/)
 
-  if (isDashboard) {
+  if (false && isDashboard) { // AUTH TEMPORAIREMENT DÉSACTIVÉ
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
