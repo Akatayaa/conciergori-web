@@ -9,7 +9,7 @@ const supabase = createClient(
 // PUT /api/invoice-profiles/[id] — { name?, lines? }
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const body = await req.json()
   const updates: Record<string, unknown> = {}
@@ -24,7 +24,7 @@ export async function PUT(
   const { data, error } = await supabase
     .from('invoice_profiles')
     .update(updates)
-    .eq('id', params.id)
+    .eq('id', (await params).id)
     .select()
     .single()
 
@@ -35,12 +35,12 @@ export async function PUT(
 // DELETE /api/invoice-profiles/[id]
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await supabase
     .from('invoice_profiles')
     .delete()
-    .eq('id', params.id)
+    .eq('id', (await params).id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return new NextResponse(null, { status: 204 })

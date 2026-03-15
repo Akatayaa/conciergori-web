@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import InvoicesList from '@/components/dashboard/InvoicesList'
 import InvoiceSettings from '@/components/dashboard/InvoiceSettings'
+import InvoiceProfiles from '@/components/dashboard/InvoiceProfiles'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,7 +20,6 @@ export default async function FacturationPage({
 }) {
   const [{ tenant: tenantSlug }, { tab = 'factures' }] = await Promise.all([params, searchParams])
 
-  // ── Résoudre le tenant ──────────────────────────────────────────────────────
   const { data: tenant } = await supabase
     .from('tenants')
     .select('*')
@@ -27,8 +27,7 @@ export default async function FacturationPage({
     .single()
   if (!tenant) return notFound()
 
-  // ── Fetch en parallèle ──────────────────────────────────────────────────────
-  const [invoicesRes, settingsRes, bookingsRes, propertiesRes] = await Promise.all([
+  const [invoicesRes, settingsRes, bookingsRes, propertiesRes, profilesRes] = await Promise.all([
     supabase
       .from('invoices')
       .select('*')
@@ -52,9 +51,14 @@ export default async function FacturationPage({
       .from('properties')
       .select('id, name')
       .eq('tenant_id', tenant.id),
+
+    supabase
+      .from('invoice_profiles')
+      .select('*')
+      .eq('tenant_id', tenant.id)
+      .order('created_at', { ascending: false }),
   ])
 
-  // Paramètres par défaut si pas encore configuré
   const defaultSettings = {
     tenant_id: tenant.id,
     concierge_rate: 20,
@@ -71,15 +75,17 @@ export default async function FacturationPage({
     company_phone: '',
   }
 
-  const settings = settingsRes.data ?? defaultSettings
-  const invoices = invoicesRes.data ?? []
-  const bookings = bookingsRes.data ?? []
+  const settings   = settingsRes.data   ?? defaultSettings
+  const invoices   = invoicesRes.data   ?? []
+  const bookings   = bookingsRes.data   ?? []
   const properties = propertiesRes.data ?? []
-  const propMap = Object.fromEntries(properties.map(p => [p.id, p.name]))
+  const profiles   = profilesRes.data   ?? []
+  const propMap    = Object.fromEntries(properties.map(p => [p.id, p.name]))
 
   const tabs = [
-    { key: 'factures',    label: '🧾 Factures' },
-    { key: 'parametres',  label: '⚙️ Paramètres' },
+    { key: 'factures',   label: '🧾 Factures' },
+    { key: 'profils',    label: '📋 Profils' },
+    { key: 'parametres', label: '⚙️ Paramètres' },
   ]
 
   return (
@@ -92,9 +98,9 @@ export default async function FacturationPage({
             Facturation
           </h1>
           <p className="text-sm" style={{ color: '#979797' }}>
-            {invoices.length} facture{invoices.length !== 1 ? 's' : ''} · {
-              invoices.filter(i => i.status === 'paid').length
-            } payée{invoices.filter(i => i.status === 'paid').length !== 1 ? 's' : ''}
+            {invoices.length} facture{invoices.length !== 1 ? 's' : ''} ·{' '}
+            {invoices.filter(i => i.status === 'paid').length} payée{invoices.filter(i => i.status === 'paid').length !== 1 ? 's' : ''} ·{' '}
+            {profiles.length} profil{profiles.length !== 1 ? 's' : ''}
           </p>
         </div>
 
@@ -117,14 +123,23 @@ export default async function FacturationPage({
         </div>
 
         {/* Content */}
-        {tab === 'factures' ? (
+        {tab === 'factures' && (
           <InvoicesList
             initialInvoices={invoices}
             confirmedBookings={bookings}
             properties={propMap}
             tenantId={tenant.id}
+            initialProfiles={profiles}
           />
-        ) : (
+        )}
+        {tab === 'profils' && (
+          <InvoiceProfiles
+            initialProfiles={profiles}
+            properties={properties}
+            tenantId={tenant.id}
+          />
+        )}
+        {tab === 'parametres' && (
           <InvoiceSettings initial={settings} />
         )}
 
