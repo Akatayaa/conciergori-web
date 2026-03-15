@@ -94,6 +94,13 @@ export default function PropertyRow({ property: prop }: PropertyRowProps) {
         {/* Export iCal */}
         <ExportIcalButton propertyId={prop.id} />
 
+        {/* Éditer */}
+        <Link href={`../logements/${prop.id}/edit`}
+          className="text-xs px-2.5 py-1 rounded-lg font-medium hover:opacity-80"
+          style={{ backgroundColor: '#f0e8da', color: '#5a5a5a' }}>
+          ✏️ Éditer
+        </Link>
+
         {/* Règles */}
         <Link href="/conciergori/dashboard/pricing"
           className="text-xs px-2.5 py-1 rounded-lg font-medium hover:opacity-80"

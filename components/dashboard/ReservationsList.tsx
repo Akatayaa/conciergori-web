@@ -37,6 +37,7 @@ export default function ReservationsList({
   const [filter, setFilter] = useState<string>('all')
   const [propFilter, setPropFilter] = useState<string>('all')
   const [updating, setUpdating] = useState<string | null>(null)
+  const [search, setSearch] = useState<string>('')
 
   const updateStatus = async (id: string, status: string) => {
     setUpdating(id)
@@ -52,6 +53,8 @@ export default function ReservationsList({
   const filtered = list.filter(b => {
     if (filter !== 'all' && b.status !== filter) return false
     if (propFilter !== 'all' && b.property_id !== propFilter) return false
+    if (search && !b.guest_name.toLowerCase().includes(search.toLowerCase()) &&
+        !b.guest_email.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
@@ -64,6 +67,22 @@ export default function ReservationsList({
 
   return (
     <div>
+      {/* Barre recherche */}
+      <div className="relative mb-4">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#979797' }}>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input
+          type="text" value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Rechercher par nom ou email..."
+          className="w-full pl-9 pr-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:border-[#0097b2]"
+          style={{ borderColor: '#e8d8c0', color: '#4b4b4b' }}
+        />
+        {search && (
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>
+        )}
+      </div>
+
       {/* Filtres statut */}
       <div className="flex flex-wrap gap-2 mb-4">
         {[
